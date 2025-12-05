@@ -10,6 +10,7 @@ import { Info, Video, Wifi, Zap } from "lucide-react";
 import Image from "next/image";
 import speedCheckLogo from "@/assets/speed-checklogo.png";
 import FlagWave from "@/components/Footer/Flag";
+import Tooltip from "@mui/material/Tooltip";
 
 const baseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL || "https://dev-traiapi.mozark.ai";
@@ -205,9 +206,11 @@ const SpeedCheckLandingPage = () => {
 
                       {t("Speed Test")}
 
-                      <span className="hidden sm:inline">
-                        <Info className="w-5 h-5" />
-                      </span>
+                      <Tooltip title={t("The speed test checks your download speed, upload speed, latency, packet loss, and jitter. These numbers help you understand how fast and stable your internet connection is.")}>
+                        <span className="hidden sm:inline">
+                          <Info className="w-5 h-5" />
+                        </span>
+                      </Tooltip>
                     </button>
 
                     <button
@@ -223,9 +226,11 @@ const SpeedCheckLandingPage = () => {
                       </span>
                       {t("Video & Browser Test")}
 
-                      <span className="hidden sm:inline">
-                        <Info className="w-5 h-5" />
-                      </span>
+                      <Tooltip title={t("Download speed tells you how fast you receive data (videos, websites, apps). Upload speed tells you how fast you send data (photos, emails, video calls). Both are important for smooth internet use.")}>
+                        <span className="hidden sm:inline">
+                          <Info className="w-5 h-5" />
+                        </span>
+                      </Tooltip>
                     </button>
                   </div>
                 </div>

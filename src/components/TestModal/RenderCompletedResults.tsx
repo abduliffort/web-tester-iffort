@@ -13,11 +13,17 @@ import {
   ArrowLeftRight,
 } from "lucide-react";
 
-const copyToClipboard = async (text: string, label: string) => {
+const copyToClipboard = async (
+  text: string,
+  label: string,
+  callback?: () => void
+) => {
   try {
     await navigator.clipboard.writeText(text);
+    // console.log(`${label} copied to clipboard:`, text);
+    if (callback) callback();
   } catch (error) {
-    // console.error(`Failed to copy ${label}:`, error);
+    console.error(`Failed to copy ${label}:`, error);
   }
 };
 
@@ -54,6 +60,8 @@ const RenderCompletedResults = ({
 }: any) => {
   const isFullTest = selectedScenarioId === ENV_CONFIG.SCENARIOS.FULL_TEST_ID;
   const t = useTranslation();
+
+  const [isCopied, setIsCopied] = React.useState(false);
 
   if (!testResults) return null;
 
@@ -159,14 +167,28 @@ const RenderCompletedResults = ({
         <div className="flex items-center gap-2 sm:gap-3">
           <span className="text-white/50 font-medium">
             {t("Test ID")}:{" "}
-            <span className="text-white font-bold">{displayTestId}</span>
+            <span
+              className={`font-bold ${
+                isCopied ? "text-green-500" : "text-white"
+              }`}
+            >
+              {displayTestId}
+            </span>
           </span>
           <button
-            onClick={() => copyToClipboard(displayTestId, t("Test ID"))}
-            className="text-white/60 hover:text-white transition"
+            onClick={() =>
+              copyToClipboard(displayTestId, t("Test ID"), () => {
+                setIsCopied(true);
+                setTimeout(() => setIsCopied(false), 2000);
+              })
+            }
+            className={`text-white/60 hover:text-white transition`}
             title={t("Copy Test ID")}
           >
-            <Copy size={16} />
+            <Copy
+              size={16}
+              className={isCopied ? "text-green-500" : "text-white"}
+            />
           </button>
         </div>
       </div>
