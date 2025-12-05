@@ -11,7 +11,7 @@ import {
 
 interface TestItem {
   label: string;
-  value: string;
+  value: string | number;
   unit: string;
   status: "completed" | "in-progress" | "pending";
   progress?: number;
@@ -32,8 +32,7 @@ export const TestProgressList: React.FC<TestProgressListProps> = ({
   const isInitializing = currentStep === "initializing";
 
   const getLucideIcon = (label: string) => {
-    const iconSize = "clamp(16px, 3vw, 24px)"; // 16px on small, up to 24px max
-
+    const iconSize = "clamp(16px, 3vw, 24px)";
     if (label.includes("Latency")) return <ArrowLeftRight size={iconSize} />;
     if (label.includes("Download")) return <Download size={iconSize} />;
     if (label.includes("Upload")) return <Upload size={iconSize} />;
@@ -41,6 +40,22 @@ export const TestProgressList: React.FC<TestProgressListProps> = ({
     if (label.includes("Video") || label.includes("Streaming"))
       return <Video size={iconSize} />;
     return <Clock size={iconSize} />;
+  };
+
+  const formatValue = (label: string, value: any, unit: string) => {
+    if (value === undefined || value === null || isNaN(Number(value)))
+      return { displayValue: "-", displayUnit: unit };
+
+    // Convert ms to s only for Web or Video
+    if (label.includes("Web") || label.includes("Video")) {
+      const seconds = Number(value) / 1000;
+      return {
+        displayValue: seconds.toFixed(2), // ✅ two decimal places
+        displayUnit: "Second",
+      };
+    }
+
+    return { displayValue: value, displayUnit: unit };
   };
 
   return (
@@ -52,6 +67,7 @@ export const TestProgressList: React.FC<TestProgressListProps> = ({
       {tests.map((test, index) => {
         const circleBgClass =
           test.color === "yellow" ? "darkYellow" : test.color ?? "bg-gray-700";
+
         test.color =
           test.status === "in-progress"
             ? "bg-gradient-to-b from-[#F3B643] from-20% to-[#F9DA95] to-80%"
@@ -73,10 +89,16 @@ export const TestProgressList: React.FC<TestProgressListProps> = ({
             ? "border-blue-300 dark:border-darkYellow shadow-sm"
             : "border-gray-200 dark:border-none";
 
+        const { displayValue, displayUnit } = formatValue(
+          test.label,
+          test.value,
+          test.unit
+        );
+
         return (
           <div
             key={index}
-            className={`relative rounded-lg border ${boxBorderClass} 
+            className={`relative rounded-lg border ${boxBorderClass}
               bg-white/5 dark:bg-white/10 
               p-3 sm:p-6 
               flex flex-col items-center justify-center text-center 
@@ -84,10 +106,13 @@ export const TestProgressList: React.FC<TestProgressListProps> = ({
           >
             {/* Circle */}
             <div
-              className={`relative w-20 h-20 sm:w-28 sm:h-28 rounded-full flex items-center justify-center ${circleBgClass} ${statusRing}`}
+              className={`relative w-20 h-20 sm:w-28 sm:h-28 rounded-full flex flex-col items-center justify-center ${circleBgClass} ${statusRing}`}
             >
               <span className="text-sm sm:text-lg font-semibold tracking-tight select-none dark:text-black">
-                {test.value ?? "-"}
+                {displayValue}
+              </span>
+              <span className="text-[0.6rem] sm:text-xs mt-1 text-black font-medium">
+                {displayUnit}
               </span>
             </div>
 
@@ -96,9 +121,6 @@ export const TestProgressList: React.FC<TestProgressListProps> = ({
               <div className="text-[0.8rem] sm:text-[1.12rem] flex items-center gap-1 sm:gap-2 font-medium justify-center truncate">
                 {getLucideIcon(test.label)}
                 {test.label}
-              </div>
-              <div className="text-gray-400 dark:text-white/40 mt-1 text-[0.7rem] sm:text-sm">
-                ({test.unit})
               </div>
             </div>
           </div>

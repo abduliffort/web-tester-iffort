@@ -16,7 +16,6 @@ import {
 const copyToClipboard = async (text: string, label: string) => {
   try {
     await navigator.clipboard.writeText(text);
-    // console.log(`${label} copied to clipboard:`, text);
   } catch (error) {
     // console.error(`Failed to copy ${label}:`, error);
   }
@@ -182,25 +181,47 @@ const RenderCompletedResults = ({
             } flex flex-col items-center justify-center text-center transition-all duration-300 sm:min-w-[160px]`}
           >
             {/* Gradient Circle */}
+            {/* Gradient Circle */}
             <div
-              className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-full flex items-center justify-center 
-                   bg-gradient-to-b from-[#F3B643] from-20% to-[#F9DA95] to-80%
-                   shadow-2xl"
+              className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-full flex flex-col items-center justify-center 
+       bg-gradient-to-b from-[#F3B643] from-20% to-[#F9DA95] to-80%
+       shadow-2xl"
             >
-              <div className="text-center">
-                <span className="text-sm sm:text-lg font-semibold tracking-tight select-none dark:text-black">
-                  {item.value ?? "-"}
-                </span>
-              </div>
+              {(() => {
+                // Convert ms → s for Web and Video
+                let displayValue = item.value;
+                let displayUnit = item.unit;
+
+                const numericValue = parseFloat(item.value);
+                if (!isNaN(numericValue)) {
+                  if (
+                    item.label.includes("Web") ||
+                    item.label.includes("Video")
+                  ) {
+                    displayValue = (numericValue / 1000).toFixed(2); // ✅ two decimals
+                    displayUnit = "Second";
+                  }
+                } else {
+                  displayValue = "-";
+                }
+
+                return (
+                  <>
+                    <span className="text-sm sm:text-lg font-semibold tracking-tight select-none dark:text-black">
+                      {displayValue}
+                    </span>
+                    <span className="text-[0.6rem] sm:text-xs mt-1 text-black font-medium">
+                      {displayUnit}
+                    </span>
+                  </>
+                );
+              })()}
             </div>
 
             {/* Label with Icon */}
             <div className="mt-2 sm:mt-3 flex items-center gap-1 sm:gap-3 text-[0.7rem] sm:text-[1.12rem]">
               {item.icon}
               {item.label}
-            </div>
-            <div className="text-gray-400 dark:text-white/40 mt-1 text-[0.65rem] sm:text-sm">
-              ({item.unit})
             </div>
           </div>
         ))}

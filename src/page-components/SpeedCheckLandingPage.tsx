@@ -6,9 +6,7 @@ import { AboutPopup } from "@/components/AboutPopup";
 import { useState, useEffect } from "react";
 import { ENV_CONFIG } from "@/lib/constants";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Info, Video, Wifi } from "lucide-react";
-import History from "@/components/history/history";
-import { usePathname } from "next/navigation";
+import { Info, Video, Wifi, Zap } from "lucide-react";
 import Image from "next/image";
 import speedCheckLogo from "@/assets/speed-checklogo.png";
 import FlagWave from "@/components/Footer/Flag";
@@ -33,8 +31,6 @@ const SpeedCheckLandingPage = () => {
   const [isp, setIsp] = useState("");
   const [location, setLocation] = useState("");
   const t = useTranslation();
-  const pathname = usePathname();
-  const isHistoryPage = pathname.includes("history");
 
   // Fetch IP info
   useEffect(() => {
@@ -174,9 +170,7 @@ const SpeedCheckLandingPage = () => {
             bg-fixed pt-16 w-full grid grid-cols-1 w-full h-full"
         >
           <div className="max-w-7xl mx-auto w-full flex flex-col max-md:mt-[4rem] mt-[5rem] max-sm:mt-[5rem]">
-            {isHistoryPage ? (
-              <History />
-            ) : currentScenarioId ? (
+            {currentScenarioId ? (
               <TestModal
                 isOpen={true}
                 onClose={handleClose}
@@ -206,7 +200,7 @@ const SpeedCheckLandingPage = () => {
                       }`}
                     >
                       <span className="hidden sm:inline">
-                        <Wifi className="w-5 h-5" />
+                        <Zap className="w-5 h-5" />
                       </span>
 
                       {t("Speed Test")}
@@ -270,36 +264,30 @@ const SpeedCheckLandingPage = () => {
               </>
             )}
           </div>
-          {!isHistoryPage && (
-            <>
-              <footer className="flex flex-row sm:grid sm:grid-cols-3 justify-between text-center gap-3 sm:gap-0 mx-auto w-full text-xs sm:text-sm mt-auto max-w-7xl mb-[6rem] max-sm:mb-[4rem]">
-                <div className="flex-1">
-                  <div className="font-normal text-gray-600 dark:text-white/80">
-                    {t("ISP Name")}
-                  </div>
-                  <div className="mt-1 break-all px-1 sm:px-2">{t(isp)} </div>
-                </div>
-                <div className="flex-1">
-                  <div className="font-normal text-gray-600 dark:text-white/80">
-                    {t("IP Address")}
-                  </div>
-                  <div className="mt-1 break-all px-1 sm:px-2">{ip}</div>
-                </div>
-                <div className="flex-1">
-                  <div className="font-normal text-gray-600 dark:text-white/80">
-                    {t("Location")}
-                  </div>
-                  <div className="mt-1 break-all px-1 sm:px-2">
-                    {t(location)}
-                  </div>
-                </div>
-              </footer>
-            </>
-          )}
+          <footer className="flex flex-row sm:grid sm:grid-cols-3 justify-between text-center gap-3 sm:gap-0 mx-auto w-full text-xs sm:text-sm mt-auto max-w-7xl mb-[6rem] max-sm:mb-[4rem]">
+            <div className="flex-1">
+              <div className="font-normal text-gray-600 dark:text-white/80">
+                {t("ISP Name")}
+              </div>
+              <div className="mt-1 px-1 sm:px-2">{t(isp)} </div>
+            </div>
+            <div className="flex-1">
+              <div className="font-normal text-gray-600 dark:text-white/80">
+                {t("IP Address")}
+              </div>
+              <div className="mt-1 px-1 sm:px-2">{ip}</div>
+            </div>
+            <div className="flex-1">
+              <div className="font-normal text-gray-600 dark:text-white/80">
+                {t("Location")}
+              </div>
+              <div className="mt-1 px-1 sm:px-2">{t(location)}</div>
+            </div>
+          </footer>
         </section>
       </>
 
-      {showFlag && !isHistoryPage && <FlagWave />}
+      {showFlag && <FlagWave />}
     </div>
   );
 };

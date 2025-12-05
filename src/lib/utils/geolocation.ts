@@ -139,6 +139,7 @@ export class GeolocationService {
 
     // Try GPS location
     try {
+      console.log("🌍 [GeolocationService] Requesting GPS location...");
       const location = await this.getGPSLocation(config);
       this.cacheLocation(location);
       // console.log("GPS location obtained:", location);

@@ -11,6 +11,7 @@ import { ThemeToggle } from "../ThemeToggle";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Rocket, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useDeviceType } from "@/hooks/useDeviceDetect";
 
 // App store badge SVGs / PNGs (you can replace with your actual assets)
 import AppStoreBadge from "@/assets/applestor.png";
@@ -61,6 +62,7 @@ export const Header: React.FC<HeaderProps> = ({
     }
     onBackClick?.();
   };
+  const { deviceType } = useDeviceType();
 
   return (
     <Fragment>
@@ -300,28 +302,36 @@ export const Header: React.FC<HeaderProps> = ({
                         </span>
                       </span>
                       <div className="gap-4 flex flex-col">
-                        <a
-                          href="https://apps.apple.com/in/app/trai-myspeed/id1129080754"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <Image
-                            src={AppStoreBadge}
-                            alt="App Store"
-                            className="w-22"
-                          />
-                        </a>
-                        <a
-                          href="https://play.google.com/store/apps/details?id=com.rma.myspeed&hl=en"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <Image
-                            src={GooglePlayBadge}
-                            alt="Google Play"
-                            className="w-22"
-                          />
-                        </a>
+                        {(deviceType === "ios" || deviceType === "other") && (
+                          <a
+                            href="https://apps.apple.com/in/app/trai-myspeed/id1129080754"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Image
+                              src={AppStoreBadge}
+                              alt="App Store"
+                              className="w-22"
+                            />
+                          </a>
+                        )}
+
+                        {(deviceType === "android" ||
+                          deviceType === "other") && (
+                          <>
+                            <a
+                              href="https://play.google.com/store/apps/details?id=com.rma.myspeed&hl=en"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Image
+                                src={GooglePlayBadge}
+                                alt="Google Play"
+                                className="w-22"
+                              />
+                            </a>
+                          </>
+                        )}
                       </div>
                     </div>
 
@@ -371,7 +381,7 @@ export const Header: React.FC<HeaderProps> = ({
       </header>
 
       {/* === NEW APP STORE / GOOGLE PLAY STRIP === */}
-      <AppDownloadPopup />
+      {/* <AppDownloadPopup /> */}
     </Fragment>
   );
 };

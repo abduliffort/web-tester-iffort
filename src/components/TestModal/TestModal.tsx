@@ -23,6 +23,7 @@ import { Download, Info, RotateCw, X } from "lucide-react";
 import RenderCompletedResults from "./RenderCompletedResults";
 import Image from "next/image";
 import speedCheckLogo from "@/assets/speed-checklogo.png";
+import Tooltip from "@mui/material/Tooltip";
 
 interface SystemInfo {
   userIP?: string;
@@ -1120,7 +1121,7 @@ export const TestModal: React.FC<TestModalProps> = ({
       // Show speed with one decimal place
       formattedValue = liveValue > 0 ? liveValue.toFixed(1) : "-";
     } else if (key === "web" || key === "streaming") {
-      unit = "ms";
+      unit = "Second";
       // Show delay with no decimal places
       formattedValue = liveValue > 0 ? liveValue.toFixed(0) : "-";
     }
@@ -1232,7 +1233,7 @@ export const TestModal: React.FC<TestModalProps> = ({
             activeActionsList.push({
               label: t("Web Page Load Time"),
               value: liveResults.web ? liveResults.web.toFixed(3) : "0.000",
-              unit: "ms",
+              unit: "Second",
               status:
                 currentStep === "web" || currentStep?.startsWith("web")
                   ? "in-progress"
@@ -1253,7 +1254,7 @@ export const TestModal: React.FC<TestModalProps> = ({
               value: liveResults.streaming
                 ? liveResults.streaming.toFixed(3)
                 : "0.000",
-              unit: "ms",
+              unit: "Second",
               status:
                 currentStep === "streaming"
                   ? "in-progress"
@@ -1388,7 +1389,16 @@ export const TestModal: React.FC<TestModalProps> = ({
               </div>
               <h2 className="text-[1.4rem] font-bold text-gray-900 dark:text-gray-100 flex items-center justify-center gap-2 max-sm:mb-[1rem] max-sm:mt-[3rem]">
                 {getTestTitle().split(":")[0]}
-                <Info />
+
+                <Tooltip
+                  title={t(
+                    currentDisplay === ENV_CONFIG.SCENARIOS.FULL_TEST_ID
+                      ? "The speed test checks your download speed, upload speed, latency, packet loss, and jitter. These numbers help you understand how fast and stable your internet connection is."
+                      : "Download speed tells you how fast you receive data (videos, websites, apps). Upload speed tells you how fast you send data (photos, emails, video calls). Both are important for smooth internet use."
+                  )}
+                >
+                  <Info />
+                </Tooltip>
               </h2>
 
               {/* Status line */}
@@ -1441,7 +1451,7 @@ export const TestModal: React.FC<TestModalProps> = ({
                     {currentStep === "download" && (
                       <SpeedGauge
                         currentSpeed={liveResults.download || 0}
-                        maxSpeed={200}
+                        maxSpeed={400}
                         label={t("Download Speed")}
                         description={t("Data receiving rate")}
                       />
@@ -1451,7 +1461,7 @@ export const TestModal: React.FC<TestModalProps> = ({
                     {currentStep === "upload" && (
                       <SpeedGauge
                         currentSpeed={liveResults.upload || 0}
-                        maxSpeed={200}
+                        maxSpeed={400}
                         label={t("Upload Speed")}
                         description={t("Data sending rate")}
                       />
