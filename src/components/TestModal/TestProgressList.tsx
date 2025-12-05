@@ -61,10 +61,10 @@ export const TestProgressList: React.FC<TestProgressListProps> = ({
 
         const statusRing =
           test.status === "in-progress"
-            ? "animate-pulse"
+            ? "animate-pulse " + test.color
             : test.status === "completed"
-            ? "ring-0"
-            : "ring-0";
+            ? "ring-0 " + test.color
+            : "ring-0 " + test.color;
 
         const boxBorderClass =
           test.status === "completed"
