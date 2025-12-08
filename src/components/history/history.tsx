@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect, useMemo, Fragment } from "react";
 import {
   ChevronDown,
@@ -25,7 +24,7 @@ interface TestResult {
 
 export default function HistoryPage() {
   const [results, setResults] = useState<TestResult[]>([]);
-  const [activeTab, setActiveTab] = useState<"all" | "speed" | "video">("all");
+  const [activeTab, setActiveTab] = useState<"speed" | "video">("speed"); // Default: Speed Test
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(15);
   const [selectedOperator, setSelectedOperator] = useState("all");
@@ -48,27 +47,27 @@ export default function HistoryPage() {
   const processedData = useMemo(() => {
     let data = [...results];
 
-    // Operator filter
     if (selectedOperator !== "all") {
       data = data.filter((r) => r.networkType === selectedOperator);
     }
 
-    // Date sort
     data.sort((a, b) => {
       const da = new Date(a.dateTime.replace(", ", " ")).getTime();
       const db = new Date(b.dateTime.replace(", ", " ")).getTime();
       return dateSort === "newest" ? db - da : da - db;
     });
 
-    // Tab filter
-    if (activeTab === "speed")
+    // Tab-specific filtering
+    if (activeTab === "speed") {
       data = data.filter(
         (r) => r.latency !== null || r.download !== null || r.upload !== null
       );
-    if (activeTab === "video")
+    }
+    if (activeTab === "video") {
       data = data.filter(
         (r) => r.webBrowsing !== null || r.videoStreaming !== null
       );
+    }
 
     return data;
   }, [results, selectedOperator, dateSort, activeTab]);
@@ -89,9 +88,9 @@ export default function HistoryPage() {
   };
 
   const formatNetwork = (type: string) => {
-    const t = type.toLowerCase();
-    if (t.includes("wifi")) return "Wi-Fi";
-    if (t.includes("4g") || t.includes("5g") || t.includes("lte"))
+    const lower = type.toLowerCase();
+    if (lower.includes("wifi")) return "Wi-Fi";
+    if (lower.includes("4g") || lower.includes("5g") || lower.includes("lte"))
       return "Mobile Data";
     return type;
   };
@@ -104,6 +103,15 @@ export default function HistoryPage() {
       : parseFloat(val.toFixed(1)) + unit;
   };
 
+  const formatDelay = (val: any) => {
+    if (val === null) return "-";
+    return val.toFixed(3);
+  };
+
+  // Show speed columns only in Speed tab, delay columns only in Video tab
+  const showSpeedColumns = activeTab === "speed";
+  const showDelayColumns = activeTab === "video";
+
   return (
     <div className="px-4 sm:px-6">
       {/* Header */}
@@ -113,28 +121,26 @@ export default function HistoryPage() {
           className="flex items-center gap-2 text-white font-semibold text-sm sm:text-base"
         >
           <ChevronLeft size={20} />
-
-          <span> {t("Back to Home")}</span>
+          <span>{t("Back to Home")}</span>
         </Link>
         <h1 className="text-lg sm:text-xl md:text-[1.4rem] font-semibold text-white text-center">
           {t("Previous Test Results")}
         </h1>
-        <div className="hidden md:block w-[120px]" /> {/* spacer for balance */}
+        <div className="hidden md:block w-[120px]" />
       </div>
 
       {/* Tabs + Filters */}
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 lg:gap-8 mb-8">
-        {/* Tabs */}
+        {/* Tabs - Only Speed and Video & Browser */}
         <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden lg:overflow-visible justify-start gap-0 lg:gap-4 border-b border-gray-300 scrollbar-hide">
           {[
-            { id: "all", label: t("All Tests") },
             { id: "speed", label: t("Speed Test") },
             { id: "video", label: t("Video & Browser Test") },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => {
-                setActiveTab(tab.id as "all" | "speed" | "video");
+                setActiveTab(tab.id as "speed" | "video");
                 setCurrentPage(1);
               }}
               className={`flex-shrink-0 pb-2 sm:pb-4 px-3 text-sm sm:text-[0.9rem] font-medium transition-colors border-b-4 -mb-px ${
@@ -147,9 +153,9 @@ export default function HistoryPage() {
             </button>
           ))}
         </div>
-        {/* Filters */}
+
+        {/* Date Sort */}
         <div className="flex flex-row flex-nowrap justify-center sm:justify-end gap-2 sm:gap-3">
-          {/* Date Sort dropdown */}
           <div className="relative inline-block">
             <select
               value={dateSort}
@@ -162,8 +168,6 @@ export default function HistoryPage() {
               <option value="newest">{t("Date & Time (Newest First)")}</option>
               <option value="oldest">{t("Date & Time (Oldest First)")}</option>
             </select>
-
-            {/* Centered Chevron icon */}
             <ChevronDown
               size={18}
               className="pointer-events-none absolute right-3 sm:right-4 top-1/2 -translate-y-[45%] text-gray-400"
@@ -172,53 +176,92 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      {/* Table (responsive horizontally) */}
+      {/* Table */}
       <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto md:overflow-visible">
           <table className="min-w-[820px] w-full text-sm md:text-[0.9rem]">
             <thead>
               <tr className="bg-darkYellow text-darkBlue">
-                {[
-                  "Date & Time",
-                  "Network Type",
-                  "Test ID",
-                  "Latency (ms)",
-                  "Download (Mbps)",
-                  "Upload (Mbps)",
-                ]?.map((item) => (
-                  <th
-                    className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue last:border-r-0"
-                    key={item}
-                  >
-                    {t(item)}
-                  </th>
-                ))}
+                <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                  {t("Date & Time")}
+                </th>
+                <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                  {t("Network Type")}
+                </th>
+                <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                  {t("Test ID")}
+                </th>
+
+                {showSpeedColumns && (
+                  <>
+                    <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                      {t("Latency (ms)")}
+                    </th>
+                    <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                      {t("Download (Mbps)")}
+                    </th>
+                    <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                      {t("Upload (Mbps)")}
+                    </th>
+                  </>
+                )}
+
+                {showDelayColumns && (
+                  <>
+                    <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                      {t("Web Browsing Delay (Sec)")}
+                    </th>
+                    <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue last:border-r-0">
+                      {t("Video Streaming Delay (Sec)")}
+                    </th>
+                  </>
+                )}
               </tr>
             </thead>
+
             <tbody className="bg-[#1F2937] text-white">
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-16 text-gray-500">
+                  <td
+                    colSpan={showSpeedColumns ? 6 : 5}
+                    className="text-center py-16 text-gray-500"
+                  >
                     {t("No results found")}
                   </td>
                 </tr>
               ) : (
-                paginated?.map((r, i) => (
+                paginated.map((r, i) => (
                   <tr key={r.testId + i} className="border-t border-gray-200">
                     <td className="px-3 md:px-6 py-4">{r.dateTime}</td>
                     <td className="px-3 md:px-6 py-4">
                       {formatNetwork(r.networkType)}
                     </td>
                     <td className="px-3 md:px-6 py-4">{r.testId}</td>
-                    <td className="px-3 md:px-6 py-4">
-                      {formatValue(r.latency)}
-                    </td>
-                    <td className="px-3 md:px-6 py-4">
-                      {formatValue(r.download)}
-                    </td>
-                    <td className="px-3 md:px-6 py-4">
-                      {formatValue(r.upload)}
-                    </td>
+
+                    {showSpeedColumns && (
+                      <>
+                        <td className="px-3 md:px-6 py-4">
+                          {formatValue(r.latency)}
+                        </td>
+                        <td className="px-3 md:px-6 py-4">
+                          {formatValue(r.download)}
+                        </td>
+                        <td className="px-3 md:px-6 py-4">
+                          {formatValue(r.upload)}
+                        </td>
+                      </>
+                    )}
+
+                    {showDelayColumns && (
+                      <>
+                        <td className="px-3 md:px-6 py-4">
+                          {formatDelay(r.webBrowsing)}
+                        </td>
+                        <td className="px-3 md:px-6 py-4">
+                          {formatDelay(r.videoStreaming)}
+                        </td>
+                      </>
+                    )}
                   </tr>
                 ))
               )}
@@ -227,21 +270,16 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      {/* Pagination */}
+      {/* Pagination - unchanged */}
       {processedData.length > 0 && (
         <Fragment>
           <div className="flex flex-col md:flex-row items-center justify-between gap-3 my-6 text-xs sm:text-sm hidden md:flex">
-            {/* Total items */}
             <TotalItems t={t} totalItems={totalItems} />
-
-            {/* Pagination */}
             <Paginations
               setCurrentPage={setCurrentPage}
               currentPage={currentPage}
               totalPages={totalPages}
             />
-
-            {/* Per page + Go to */}
             <PerPage
               t={t}
               itemsPerPage={itemsPerPage}
@@ -254,20 +292,15 @@ export default function HistoryPage() {
               currentPage={currentPage}
             />
           </div>
+
           <div className="flex flex-col md:flex-row items-center justify-between gap-3 my-6 text-xs sm:text-sm md:hidden">
-            {/* Pagination */}
             <Paginations
               setCurrentPage={setCurrentPage}
               currentPage={currentPage}
               totalPages={totalPages}
             />
-
-            {/* Total items + Per page + Go to (same line) */}
             <div className="order-2 md:order-1 flex w-full md:w-auto justify-between items-center sm:gap-6 gap-[2rem] text-white">
-              {/* Total items */}
               <TotalItems t={t} totalItems={totalItems} />
-
-              {/* Per page + Go to */}
               <PerPage
                 t={t}
                 itemsPerPage={itemsPerPage}
@@ -287,6 +320,7 @@ export default function HistoryPage() {
   );
 }
 
+// Pagination components remain exactly the same
 const Paginations = ({
   setCurrentPage,
   currentPage,
@@ -311,7 +345,6 @@ const Paginations = ({
     >
       <ChevronLeft size={18} />
     </button>
-
     <div className="flex gap-0.5 sm:gap-1">
       {Array.from({ length: totalPages }, (_, i) => i + 1)
         .filter((page) => {
@@ -325,7 +358,7 @@ const Paginations = ({
             page === totalPages
           );
         })
-        ?.map((page, idx, arr) => {
+        .map((page, idx, arr) => {
           const prev = arr[idx - 1];
           const showDots = prev && page - prev > 1;
           return (
@@ -347,7 +380,6 @@ const Paginations = ({
           );
         })}
     </div>
-
     <button
       onClick={() => setCurrentPage((p: any) => Math.min(totalPages, p + 1))}
       disabled={currentPage === totalPages}
@@ -421,7 +453,6 @@ const PerPage = ({
         50 / page
       </option>
     </select>
-
     <div className="flex items-center gap-1 sm:gap-2">
       <span>Go to</span>
       <input

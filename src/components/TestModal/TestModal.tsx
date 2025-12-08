@@ -59,6 +59,7 @@ export const TestModal: React.FC<TestModalProps> = ({
   masterId = undefined,
   masterUuid = undefined,
   isLastTest = false, // NEW: Indicates if this is the last test in continuous mode
+  setCurrentScenarioId,
 }) => {
   const t = useTranslation();
   const [isRunning, setIsRunning] = useState(false);
@@ -797,29 +798,6 @@ export const TestModal: React.FC<TestModalProps> = ({
     }
   }, [handleStopTest, onCancelTest, testEngine, selectedScenarioId]);
 
-  const handleClose = useCallback(() => {
-    // Block closing if test is running - show popup instead
-    if (isTestRunningRef.current) {
-      setShowBlockerPopup(true);
-      return;
-    }
-
-    // Clear Master ID cache when closing modal (end of continuous test session)
-    if (
-      testEngine &&
-      selectedScenarioId === ENV_CONFIG.SCENARIOS.CONTINUOUS_TEST_ID
-    ) {
-      // console.log(
-      //   "🧹 Continuous test session ending - clearing Master ID cache"
-      // );
-      testEngine.clearMasterIdCache();
-    }
-
-    // Only close if test is not running
-    handleStopTest();
-    onClose();
-  }, [onClose, handleStopTest, testEngine, selectedScenarioId]);
-
   const handleReset = useCallback(
     async (newScenarioId?: number) => {
       // Determine the scenario ID to RUN:
@@ -1315,6 +1293,9 @@ export const TestModal: React.FC<TestModalProps> = ({
 
   const currentDisplay = displayScenarioId ?? selectedScenarioId;
 
+  const gotoHomepage = () => {
+    setCurrentScenarioId?.(undefined);
+  };
   return (
     <div className="w-full">
       <div className="w-full">
@@ -1349,7 +1330,6 @@ export const TestModal: React.FC<TestModalProps> = ({
                     )}
                   </button>
                 )}
-
                 {results && (
                   <>
                     {onTestAgain && (!masterId || isLastTest) && (
@@ -1357,7 +1337,7 @@ export const TestModal: React.FC<TestModalProps> = ({
                         onClick={() => {
                           handleReset();
                         }}
-                        className="absolute w-[12rem] justify-center text-[0.9rem] gap-2 px-6 font-semibold flex border border-white right-2 top-20 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+                        className="absolute w-[12rem] justify-center text-[0.9rem] gap-2 px-6 font-semibold flex border border-white right-2 top-2 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
                       >
                         {t("Test Again")}
 
@@ -1368,11 +1348,17 @@ export const TestModal: React.FC<TestModalProps> = ({
                       onClick={() => {
                         handleSuggest();
                       }}
-                      className="absolute w-[12rem] justify-center text-[0.9rem] gap-2 px-6 font-semibold flex border border-darkYellow right-2 top-40 dark:hover:text-gray-300 transition-colors p-2 dark:hover:bg-gray-800 rounded-full"
+                      className="absolute w-[12rem] justify-center text-[0.9rem] gap-2 px-6 font-semibold flex border border-darkYellow right-2 top-20 dark:hover:text-gray-300 transition-colors p-2 dark:hover:bg-gray-800 rounded-full"
                     >
                       {currentDisplay === ENV_CONFIG.SCENARIOS.FULL_TEST_ID
-                        ? t("Run Speed Test")
+                        ? t("Run a Speed Test")
                         : t("Run a Video & Browser Test")}
+                    </button>
+                    <button
+                      onClick={gotoHomepage}
+                      className="absolute w-[12rem] justify-center text-[0.9rem] gap-2 px-6 font-semibold flex border border-white right-2 top-40 dark:hover:text-gray-300 transition-colors p-2 dark:hover:bg-gray-800 rounded-full"
+                    >
+                      {t("Go to Home")}
                     </button>
                   </>
                 )}
@@ -1382,7 +1368,7 @@ export const TestModal: React.FC<TestModalProps> = ({
               <div className="flex justify-center mb-[2rem] max-sm:mt-[3rem] max-sm:mb-[1rem] block max-sm:hidden">
                 <Image
                   src={speedCheckLogo}
-                  alt="SPEED CHECK"
+                  alt="MySpeed"
                   className="w-[200px] max-sm:hidden"
                   priority
                 />
@@ -1572,7 +1558,7 @@ export const TestModal: React.FC<TestModalProps> = ({
         </div>
       </div>
 
-      <div className="block lg:hidden flex flex-col gap-4 mb-[2rem] mx-3 items-center">
+      <div className="block lg:hidden flex flex-col gap-4 mb-[2rem] mx-3">
         {/* Top two buttons in a row */}
         <div className="flex justify-between gap-2">
           {!results && isRunning && (
@@ -1595,15 +1581,24 @@ export const TestModal: React.FC<TestModalProps> = ({
           )}
 
           {results && onTestAgain && (!masterId || isLastTest) && (
-            <button
-              onClick={() => {
-                handleReset();
-              }}
-              className="justify-center text-[0.9rem] gap-2 px-4 font-semibold flex border border-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
-            >
-              {t("Test Again")}
-              <RotateCw size={20} />
-            </button>
+            <>
+              <button
+                onClick={() => {
+                  handleReset();
+                }}
+                className="justify-center w-full text-[0.9rem] gap-2 px-4 font-semibold flex border border-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+              >
+                {t("Test Again")}
+                <RotateCw size={20} />
+              </button>
+              <button
+                onClick={gotoHomepage}
+                className="justify-center w-full text-[0.9rem] gap-2 px-4 font-semibold flex border border-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+              >
+                {t("Go to Home")}
+                <RotateCw size={20} />
+              </button>
+            </>
           )}
         </div>
 
@@ -1611,10 +1606,10 @@ export const TestModal: React.FC<TestModalProps> = ({
         {results && (
           <button
             onClick={handleSuggest}
-            className="justify-center text-[0.9rem] gap-2 px-4 font-semibold flex border border-darkYellow dark:hover:text-gray-300 transition-colors p-2 dark:hover:bg-gray-800 rounded-full"
+            className="justify-center w-full text-[0.9rem] gap-2 px-4 font-semibold flex border border-darkYellow dark:hover:text-gray-300 transition-colors p-2 dark:hover:bg-gray-800 rounded-full"
           >
             {currentDisplay === ENV_CONFIG.SCENARIOS.FULL_TEST_ID
-              ? t("Run Speed Test")
+              ? t("Run a Speed Test")
               : t("Run a Video & Browser Test")}
           </button>
         )}

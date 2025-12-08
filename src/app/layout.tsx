@@ -12,7 +12,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Speed Check - Test Your Internet Speed",
+  title: "MySpeed - Test Your Internet Speed",
   description:
     "Check your internet speed with our comprehensive speed test tool",
 };

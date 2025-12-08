@@ -7,15 +7,15 @@
 export const TEST_CONFIG = {
   // Download Test
   DOWNLOAD: {
-    DEFAULT_FILENAME: '1000000000', // 1GB file
-    DEFAULT_FILE_EXTENSION: '.file',
-    DEFAULT_RESOURCE_PATH: '/dl/',
+    DEFAULT_FILENAME: "1000000000", // 1GB file
+    DEFAULT_FILE_EXTENSION: ".file",
+    DEFAULT_RESOURCE_PATH: "/dl/",
     DEFAULT_TIMEOUT_S: 30000, // 30 seconds safety timeout
     DEFAULT_REQUEST_TIMEOUT_S: 15000, // 15 seconds per request
     GRACE_PERIOD_MS: 5000, // 5 seconds grace period for ongoing chunks
     DEFAULT_THREADS: 4,
     DEFAULT_WARMUP_DURATION_S: 2,
-    DEFAULT_MEASUREMENT_DURATION_S: 5
+    DEFAULT_MEASUREMENT_DURATION_S: 5,
   },
 
   // Upload Test
@@ -29,7 +29,7 @@ export const TEST_CONFIG = {
     DEFAULT_MEASUREMENT_DURATION_S: 5,
     THEORETICAL_MAX_MBPS: 50, // Theoretical maximum upload speed
     CRYPTO_CHUNK_SIZE: 65536, // 64KB chunks for crypto random data
-    DEFAULT_ENDPOINT: '/ul/upload.php', // Default upload endpoint
+    DEFAULT_ENDPOINT: "/ul/upload.php", // Default upload endpoint
   },
 
   // Latency Test
@@ -44,11 +44,11 @@ export const TEST_CONFIG = {
     WEBRTC_TIMEOUT_MS: 10000, // 10s for WebRTC connection
     WEBSOCKET_FALLBACK_DELAY_MS: 5000,
     DEFAULT_WEBSOCKET_PORT: 8443,
-    WEBSOCKET_PROTOCOL: 'wss://',
-    FALLBACK_WEBSOCKET_SERVER: 'wss://jio-test-server.mozark.ai:8443',
-    FALLBACK_STUN1: 'stun:stun.l.google.com:19302',
-    FALLBACK_STUN2: 'stun:stun1.l.google.com:19302',
-    TRAI_STUN1: 'stun:35.207.244.56:3478',
+    WEBSOCKET_PROTOCOL: "wss://",
+    FALLBACK_WEBSOCKET_SERVER: "wss://jio-test-server.mozark.ai:8443",
+    FALLBACK_STUN1: "stun:stun.l.google.com:19302",
+    FALLBACK_STUN2: "stun:stun1.l.google.com:19302",
+    TRAI_STUN1: "stun:35.207.244.56:3478",
     // WebSocket Protocol Constants
     WEBSOCKET_MIN_PACKET_SIZE: 20, // Minimum packet size for parsing
     WEBSOCKET_MARKER: 0x57535049, // 'WSPI' binary marker
@@ -60,14 +60,14 @@ export const TEST_CONFIG = {
     WEBRTC_PAYLOAD_OFFSET: 20,
     // Progress Constants
     PROGRESS: {
-      CONNECTION_ESTABLISHED: 5,     // WebRTC connection established (5%)
-      SENDING_START: 5,             // Start of sending phase (5%)
-      SENDING_END_WEBRTC: 65,       // End of sending phase WebRTC (65%)
-      SENDING_END_WEBSOCKET: 60,    // End of sending phase WebSocket (60%)
-      RECEIVING_RANGE_WEBRTC: 35,   // Receiving phase range WebRTC (35%)
+      CONNECTION_ESTABLISHED: 5, // WebRTC connection established (5%)
+      SENDING_START: 5, // Start of sending phase (5%)
+      SENDING_END_WEBRTC: 65, // End of sending phase WebRTC (65%)
+      SENDING_END_WEBSOCKET: 60, // End of sending phase WebSocket (60%)
+      RECEIVING_RANGE_WEBRTC: 35, // Receiving phase range WebRTC (35%)
       RECEIVING_RANGE_WEBSOCKET: 40, // Receiving phase range WebSocket (40%)
-      COMPLETE: 100,                // Test complete (100%)
-    }
+      COMPLETE: 100, // Test complete (100%)
+    },
   },
 
   // Web Test
@@ -87,15 +87,15 @@ export const TEST_CONFIG = {
   // Streaming Test
   STREAMING: {
     DEFAULT_TIMEOUT_S: 30,
-    DEFAULT_CONTAINER_HEIGHT: '400px',
-    DEFAULT_CONTAINER_MIN_HEIGHT: '300px',
+    DEFAULT_CONTAINER_HEIGHT: "400px",
+    DEFAULT_CONTAINER_MIN_HEIGHT: "300px",
     LAG_DETECTION_THRESHOLD_S: 0.5,
     LAG_DETECTION_INTERVAL_MS: 500,
     PROGRESS_UPDATE_INTERVAL_MS: 500,
     UI_UPDATE_DELAY_MS: 100,
-    DEFAULT_RESOURCE: '/videos/Mozark-30s-720p.m3u8',
+    DEFAULT_RESOURCE: "/videos/Mozark-30s-720p.m3u8",
     LAG_RATIO_THRESHOLD: 0.5, // 50% lag ratio threshold for success determination
-    FILE_EXTENSION: 'm3u8', // HLS file extension
+    FILE_EXTENSION: "m3u8", // HLS file extension
   },
 } as const;
 
@@ -122,9 +122,9 @@ export const API_CONFIG = {
   // TRAI Submission
   TRAI: {
     DEFAULT_SCENARIO_ID: 1447,
-    SUBMISSION_CATEGORY: 'Full Test' as const,
-    DEFAULT_VERSION: '1.0',
-    DEFAULT_LOCATION_TYPE: 'INDOOR' as const,
+    SUBMISSION_CATEGORY: "Full Test" as const,
+    DEFAULT_VERSION: "1.0",
+    DEFAULT_LOCATION_TYPE: "INDOOR" as const,
     DEFAULT_BATTERY_LEVEL: -1,
     DEVICE_GLOBAL_TRAFFIC_MULTIPLIER: 1.1,
     // Duration constants in microseconds
@@ -157,7 +157,7 @@ export const API_CONFIG = {
     // Number base conversions
     STRING_BASE_36: 36,
     STRING_BASE_10: 10,
-    STRING_BASE_16: 16
+    STRING_BASE_16: 16,
   },
 } as const;
 
@@ -165,11 +165,11 @@ export const API_CONFIG = {
 export const UI_CONFIG = {
   // Colors (for consistent theming)
   COLORS: {
-    PRIMARY: '#8B5CF6',
-    SUCCESS: '#10B981',
-    ERROR: '#EF4444',
-    WARNING: '#F59E0B',
-    INFO: '#3B82F6',
+    PRIMARY: "#8B5CF6",
+    SUCCESS: "#10B981",
+    ERROR: "#EF4444",
+    WARNING: "#F59E0B",
+    INFO: "#3B82F6",
   },
 
   // Progress and Animation
@@ -181,9 +181,9 @@ export const UI_CONFIG = {
 
   // Dimensions
   DIMENSIONS: {
-    MIN_CONTAINER_HEIGHT: '300px',
-    MAX_CONTAINER_HEIGHT: '400px',
-    BORDER_RADIUS: '8px',
+    MIN_CONTAINER_HEIGHT: "300px",
+    MAX_CONTAINER_HEIGHT: "400px",
+    BORDER_RADIUS: "8px",
   },
 } as const;
 
@@ -199,17 +199,17 @@ export const NETWORK_CONFIG = {
   MAX_REASONABLE_PACKET_LOSS_PERCENT: 100,
   // Connection Types
   CONNECTION_TYPES: {
-    WIFI: 'wifi' as const,
-    ETHERNET: 'ethernet' as const,
-    CELLULAR: 'cellular' as const,
-    UNKNOWN: 'unknown' as const,
+    WIFI: "wifi" as const,
+    ETHERNET: "ethernet" as const,
+    CELLULAR: "cellular" as const,
+    UNKNOWN: "unknown" as const,
   },
 
   // Technology Types
   TECH_TYPES: {
-    WIFI: 'WIFI' as const,
-    ETHERNET: 'ETHERNET' as const,
-    UNKNOWN: 'UNKNOWN' as const,
+    WIFI: "WIFI" as const,
+    ETHERNET: "ETHERNET" as const,
+    UNKNOWN: "UNKNOWN" as const,
   },
 
   // HLS Configuration - Optimized for cache-disabled streaming tests
@@ -217,7 +217,7 @@ export const NETWORK_CONFIG = {
     ENABLE_WORKER: true,
     LOW_LATENCY_MODE: true,
     BACK_BUFFER_LENGTH: 0, // Disable back buffer to prevent .ts segment caching
-    MAX_BUFFER_LENGTH: 5,  // Minimal buffer to force frequent segment requests
+    MAX_BUFFER_LENGTH: 5, // Minimal buffer to force frequent segment requests
     MAX_MAX_BUFFER_LENGTH: 10, // Limit maximum buffer accumulation
     START_LEVEL: -1, // Auto-select
     AUTO_START_LOAD: true,
@@ -252,45 +252,48 @@ export const GEO_CONFIG = {
     DEFAULT_GPS_TIMEOUT_MS: 10000,
     GPS_PERMISSION_TIMEOUT_MS: 5000,
     IP_LOCATION_ACCURACY_METERS: 1000,
-    PERMISSION_CHECK_TIMEOUT_MS: 2000
-  }
+    PERMISSION_CHECK_TIMEOUT_MS: 2000,
+  },
 } as const;
 
 // Environment Configuration
 export const ENV_CONFIG = {
   // Development vs Production
-  NODE_ENV: process.env.NODE_ENV || 'development',
-  
+  NODE_ENV: process.env.NODE_ENV || "development",
+
   // Feature Flags
   FEATURES: {
-    ENABLE_SUBMISSION: process.env.NEXT_PUBLIC_ENABLE_SUBMISSION !== 'false',
-    ENABLE_LOGGING: process.env.NEXT_PUBLIC_ENABLE_LOGGING !== 'false',
-    ENABLE_WEBRTC: process.env.NEXT_PUBLIC_ENABLE_WEBRTC !== 'false',
-    ENABLE_GPS: process.env.NEXT_PUBLIC_ENABLE_GPS !== 'false',
+    ENABLE_SUBMISSION: process.env.NEXT_PUBLIC_ENABLE_SUBMISSION !== "false",
+    ENABLE_LOGGING: process.env.NEXT_PUBLIC_ENABLE_LOGGING !== "false",
+    ENABLE_WEBRTC: process.env.NEXT_PUBLIC_ENABLE_WEBRTC !== "false",
+    ENABLE_GPS: process.env.NEXT_PUBLIC_ENABLE_GPS !== "false",
   },
 
   // URLs and Endpoints
   API: {
-  BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev-traiapi.mozark.ai',
-    AUTH_URL: process.env.NEXT_PUBLIC_AUTH_URL || '',
-    SCENARIOS_URL: process.env.NEXT_PUBLIC_SCENARIOS_URL || '',
-    SERVERS_URL: process.env.NEXT_PUBLIC_SERVERS_URL || 'https://trai-test-server.mozark.ai',
-    GEOIP_URL: process.env.NEXT_PUBLIC_GEOIP_URL || '',
-    SUBMISSION_URL: process.env.NEXT_PUBLIC_SUBMISSION_URL || '',
-    DEFAULT_HOST: process.env.NEXT_PUBLIC_DEFAULT_HOST || 'https://qosi-5g.fr',
+    BASE_URL:
+      process.env.NEXT_PUBLIC_API_BASE_URL || "https://dev-traiapi.mozark.ai",
+    AUTH_URL: process.env.NEXT_PUBLIC_AUTH_URL || "",
+    SCENARIOS_URL: process.env.NEXT_PUBLIC_SCENARIOS_URL || "",
+    SERVERS_URL:
+      process.env.NEXT_PUBLIC_SERVERS_URL ||
+      "https://trai-test-server.mozark.ai",
+    GEOIP_URL: process.env.NEXT_PUBLIC_GEOIP_URL || "",
+    SUBMISSION_URL: process.env.NEXT_PUBLIC_SUBMISSION_URL || "",
+    DEFAULT_HOST: process.env.NEXT_PUBLIC_DEFAULT_HOST || "https://qosi-5g.fr",
   },
 
   // Development Configuration
   DEV: {
     DEFAULT_SCENARIO_ID: 1450,
     HTTPS_SERVER_PORT: 3001,
-    FALLBACK_SERVER_IP: '35.207.244.56',
+    FALLBACK_SERVER_IP: "35.207.244.56",
   },
   SCENARIOS: {
-    QUICK_TEST_ID: 1444,      // DataTestWeb - Latency + Download + Upload
-    FULL_TEST_ID: 1462,       // FullTest Scenario-Webtester (All tests including Web Browsing)
+    QUICK_TEST_ID: 1444, // DataTestWeb - Latency + Download + Upload
+    FULL_TEST_ID: 1475, // FullTest Scenario-Webtester (All tests including Web Browsing)
     CONTINUOUS_TEST_ID: 9999, // Special ID for Continuous Test page (not a real scenario)
-  }
+  },
 } as const;
 
 // Protocol Constants
@@ -304,21 +307,21 @@ export const PROTOCOL_CONFIG = {
 
 // URLs and Endpoints
 export const URLS = {
-  FALLBACK_API_URL: 'https://dev-traiapi.mozark.ai',
-  DEFAULT_TRAI_API_URL: 'https://api.myspeed.trai.gov.in',
-  FALLBACK_SERVER_URL: 'https://trai-test-server.mozark.ai/',
+  FALLBACK_API_URL: "https://dev-traiapi.mozark.ai",
+  DEFAULT_TRAI_API_URL: "https://api.myspeed.trai.gov.in",
+  FALLBACK_SERVER_URL: "https://trai-test-server.mozark.ai/",
   WEB_TEST_URLS: [
-    'https://www.wikipedia.org',
-    'https://test.5gmark.com/kepler/',
-    'https://httpbin.org/html'
-  ]
+    "https://www.wikipedia.org",
+    "https://test.5gmark.com/kepler/",
+    "https://httpbin.org/html",
+  ],
 } as const;
 
-// Authentication Configuration  
+// Authentication Configuration
 export const AUTH_CONFIG = {
-  DEFAULT_PUBLIC_KEY: 'TRAICROWD',
-  UUID_WEB_SUFFIX: '-WEB',
-  DEFAULT_APP_VERSION: '1.0'
+  DEFAULT_PUBLIC_KEY: "TRAICROWD",
+  UUID_WEB_SUFFIX: "-WEB",
+  DEFAULT_APP_VERSION: "1.0",
 };
 
 // Server Configuration
@@ -326,12 +329,12 @@ export const SERVER_CONFIG = {
   FALLBACK_SERVER: {
     id: 1000,
     name: "stable-test-server",
-    ip: "34.93.140.60", 
+    ip: "34.93.140.60",
     port: "5000",
     url: "https://trai-test-server.mozark.ai/",
     video: 0,
-    websocket_port: "8443"
-  }
+    websocket_port: "8443",
+  },
 } as const;
 
 // Export all constants as a single object for easy importing
@@ -345,8 +348,8 @@ export const CONSTANTS = {
   PROTOCOL: PROTOCOL_CONFIG,
   URLS: URLS,
   AUTH: AUTH_CONFIG,
-  SERVER: SERVER_CONFIG
-}
+  SERVER: SERVER_CONFIG,
+};
 
 // Validation Constants
 export const VALIDATION_CONFIG = {
@@ -358,9 +361,9 @@ export const VALIDATION_CONFIG = {
 // Cache Busting Configuration
 export const CACHE_CONFIG = {
   // URL parameter names for cache busting
-  URL_PARAM_TS_PREFIX: '_ts_nb',      // For .ts video segments
-  URL_PARAM_CACHE_PREFIX: '_nb',      // For general cache busting
-  URL_PARAM_WEB_PREFIX: 'bustcache',  // For web page cache busting
+  URL_PARAM_TS_PREFIX: "_ts_nb", // For .ts video segments
+  URL_PARAM_CACHE_PREFIX: "_nb", // For general cache busting
+  URL_PARAM_WEB_PREFIX: "bustcache", // For web page cache busting
   CACHE_BUST_SUBSTRING_START: 2,
 } as const;
 
@@ -369,10 +372,10 @@ export const PERFORMANCE_CONFIG = {
   // Load checking intervals
   LOAD_CHECK_INTERVAL_MS: 100,
   LOAD_COMPLETION_TIMEOUT_MS: 15000,
-  
+
   // Rate calculation precision
   RATE_CALCULATION_PRECISION: 1, // toFixed(1)
-  
+
   // Memory pressure generation for cache clearing
   MEMORY_PRESSURE_ITERATIONS: 5,
   MEMORY_PRESSURE_ARRAY_SIZE_SMALL: 50000,
@@ -383,9 +386,9 @@ export const PERFORMANCE_CONFIG = {
 // Display and Formatting
 export const DISPLAY_CONFIG = {
   // Precision for numeric displays
-  SPEED_DISPLAY_PRECISION: 0,        // Math.round for speeds
-  TIME_DISPLAY_PRECISION: 2,         // toFixed(2) for durations
-  LATENCY_DISPLAY_PRECISION: 1,      // toFixed(1) for latency
+  SPEED_DISPLAY_PRECISION: 0, // Math.round for speeds
+  TIME_DISPLAY_PRECISION: 2, // toFixed(2) for durations
+  LATENCY_DISPLAY_PRECISION: 1, // toFixed(1) for latency
 } as const;
 
 // Type exports for better TypeScript support

@@ -9,8 +9,8 @@ const FlagWave = () => {
   return (
     <>
       {/* Desktop view unchanged */}
-      <div className="flex flex-col jutify-end items-end fixed bottom-[7rem] max-md:bottom-[10rem] right-4 gap-4 max-sm:gap-2 max-sm:relative max-sm:w-full max-sm:flex-row max-sm:justify-evenly max-sm:items-center max-sm:px-4 max-sm:bottom-[3.3rem] max-sm:mx-4">
-        <span className="max-sm:text-center">Available-</span>
+      <div className="sm:flex flex-col jutify-end items-end fixed bottom-[7rem] max-md:bottom-[10rem] right-4 gap-4 max-sm:gap-2 max-sm:relative max-sm:w-full max-sm:flex-row max-sm:justify-evenly max-sm:items-center max-sm:px-4 max-sm:bottom-[3.3rem] max-sm:mx-4 hidden">
+        <span className="max-sm:text-center">Available on-</span>
 
         {(deviceType === "ios" || deviceType === "other") && (
           <a
@@ -36,7 +36,7 @@ const FlagWave = () => {
         <img
           src="/images/flag-wave.svg"
           alt="indian-flag"
-          className="w-full h-full scale-x-[-1] max-sm:object-contain max-sm:object-bottom"
+          className="w-full h-full scale-x-[-1] object-contain object-bottom"
         />
       </div>
     </>

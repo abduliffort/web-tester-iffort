@@ -1,22 +1,20 @@
 "use client";
 import { Fragment, useState, useEffect } from "react";
 import Image from "next/image";
-import speedCheckLogo from "@/assets/speed-checklogo.png";
 import traiLogo from "@/assets/trai-logo-1.png";
 import ashokPiller from "@/assets/ashoka_pillar.png";
-import traiw from "@/assets/trai-w.svg";
 import { TestBlockerPopup } from "../TestModal/TestBlockerPopup";
 import { LanguageSelector } from "../LanguageSelector";
-import { ThemeToggle } from "../ThemeToggle";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Rocket, X } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 import { useDeviceType } from "@/hooks/useDeviceDetect";
 
 // App store badge SVGs / PNGs (you can replace with your actual assets)
 import AppStoreBadge from "@/assets/applestor.png";
 import GooglePlayBadge from "@/assets/playstore.png";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   onLogoClick?: () => void;
@@ -27,23 +25,46 @@ interface HeaderProps {
   onRunTest?: (scenarioId: number) => void;
   onAboutClick?: () => void;
   extraCss?: string;
+  upLiftStore?: (showAppStrip: boolean) => void;
 }
+
+const Logo = ({ handleLogoClick }: { handleLogoClick: () => void }) => (
+  <Link
+    href="/"
+    className={cn(
+      "flex items-center justify-start gap-2 sm:px-2 cursor-pointer"
+    )}
+    onClick={handleLogoClick}
+  >
+    <Image src={ashokPiller} alt="TRAI" className="h-8 w-auto" priority />
+    <Image src={traiLogo} alt="TRAI" className="h-8 w-auto" priority />
+    <div className="flex flex-col justify-center leading-tight">
+      <div className="text-[11px] font-semibold">
+        भारतीय दूरसंचार विनियामक प्राधिकरण
+      </div>
+      <div className="text-[11px] font-semibold">
+        Telecom Regulatory Authority Of India
+      </div>
+      <div className="text-[9px]">
+        (IS/ISO 9001:2015 Certified Organisation)
+      </div>
+    </div>
+  </Link>
+);
 
 export const Header: React.FC<HeaderProps> = ({
   onLogoClick,
   showBackButton = false,
-  onBackClick,
   isTestRunning = false,
-  onNavigate,
-  onRunTest,
   onAboutClick,
   extraCss,
+  upLiftStore
 }) => {
+  const { deviceType } = useDeviceType();
   const router = useRouter();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showBlockerPopup, setShowBlockerPopup] = useState(false);
-  const [showTestDropdown, setShowTestDropdown] = useState(false);
 
   const t = useTranslation();
 
@@ -52,17 +73,15 @@ export const Header: React.FC<HeaderProps> = ({
       setShowBlockerPopup(true);
       return;
     }
-    router.push("/");
+    onLogoClick?.();
   };
-
-  const handleBackClick = () => {
+  const handleHistoryNavigate = () => {
     if (isTestRunning) {
       setShowBlockerPopup(true);
       return;
     }
-    onBackClick?.();
+    router.push("/history");
   };
-  const { deviceType } = useDeviceType();
 
   return (
     <Fragment>
@@ -70,125 +89,23 @@ export const Header: React.FC<HeaderProps> = ({
       <header
         className={`bg-white dark:bg-darkPrimary border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 w-full transition-colors ${extraCss}`}
       >
+        {/* === NEW APP STORE / GOOGLE PLAY STRIP === */}
+        <AppDownloadPopup upLiftStore={upLiftStore} />
         {/* ... all your existing header code ... */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="flex flex-col sm:flex-row items-center justify-between h-auto sm:h-16 py-4 sm:py-12">
-            {/* ---------- MOBILE VIEW ---------- */}
-            <div className="flex flex-col w-full sm:hidden">
-              {/* Top Row: Tests + Language + Toggle */}
-              <div className="flex items-center justify-between px-2">
-                {/* Left: Tests */}
-                {/* <span className="text-[13px] font-medium text-gray-100 flex items-center gap-1">
-                  <Rocket size={14} fill="white" />
-                  {t("279401 Tests Done")}
-                </span> */}
-                <LanguageSelector />
-
-                {/* Right: Language + Toggle */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="p-2 text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                    aria-label="Toggle menu"
-                  >
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      {isMobileMenuOpen ? (
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      ) : (
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 6h16M4 12h16M4 18h16"
-                        />
-                      )}
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              {/* Divider Line */}
-              <div className="border-t border-gray-500 my-2 w-full"></div>
-
-              {/* Logos and Text */}
-              <div
-                className="flex items-center justify-start gap-3 px-2 cursor-pointer"
-                onClick={handleLogoClick}
-              >
-                <Image
-                  src={ashokPiller}
-                  alt="TRAI"
-                  className="h-8 w-auto"
-                  priority
-                />
-                <Image
-                  src={traiLogo}
-                  alt="TRAI"
-                  className="h-8 w-auto"
-                  priority
-                />
-                <div className="flex flex-col justify-center leading-tight">
-                  <div className="text-[11px] font-semibold">
-                    भारतीय दूरसंचार विनियामक प्राधिकरण
-                  </div>
-                  <div className="text-[12px] font-semibold">
-                    Telecom Regulatory Authority Of India
-                  </div>
-                  <div className="text-[9px]">
-                    (IS/ISO 9001:2015 Certified Organisation)
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ---------- DESKTOP VIEW (unchanged) ---------- */}
-            <div className="hidden sm:flex items-center justify-between w-full">
+            <div className="flex items-center justify-between w-full">
               {/* Your original desktop code here */}
-              <div
-                className="flex items-center gap-4 cursor-pointer"
-                onClick={handleLogoClick}
-              >
-                <Image
-                  src={ashokPiller}
-                  alt="TRAI"
-                  className="h-8 sm:h-11 w-auto"
-                  priority
-                />
-                <Image
-                  src={traiLogo}
-                  alt="TRAI"
-                  className="h-8 sm:h-11 w-auto"
-                  priority
-                />
-                <div className="pr-4">
-                  <div className="text-[12px] font-semibold">
-                    भारतीय दूरसंचार विनियामक प्राधिकरण
-                  </div>
-                  <div className="text-sm font-semibold">
-                    Telecom Regulatory Authority Of India
-                  </div>
-                  <div className="text-[10px]">
-                    (IS/ISO 9001:2015 Certified Organisation)
-                  </div>
-                </div>
-              </div>
+              <Logo handleLogoClick={handleLogoClick} />
 
               <div className="flex justify-end items-center gap-4">
                 {/* <span className="text-[13px] font-medium text-gray-100 flex items-center gap-1">
                   <Rocket size={16} fill="white" />
                   {t("279401 Tests Done")}
                 </span> */}
-                <LanguageSelector />
+                <div className="sm:block hidden">
+                  <LanguageSelector />
+                </div>
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="p-2 text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
@@ -222,17 +139,14 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Mobile menu sidebar - unchanged */}
-          {/* === MOBILE SIDEBAR – Responsive: Right (30%) on large, Top (70%) on small === */}
-          {/* === FINAL SIDEBAR – Simple Right-to-Left Slide + Language Dropdown === */}
           {!showBackButton && (
-            <>
+            <Fragment>
               {/* Dark Overlay */}
               <div
-                className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
-                  isMobileMenuOpen
-                    ? "opacity-100"
-                    : "opacity-0 pointer-events-none"
-                }`}
+                className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${isMobileMenuOpen
+                  ? "opacity-100"
+                  : "opacity-0 pointer-events-none"
+                  }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               />
 
@@ -242,11 +156,10 @@ export const Header: React.FC<HeaderProps> = ({
                 fixed top-0 right-0 md:bottom-0 w-full md:w-[30%] bg-darkPrimary text-white z-50
                 flex flex-col
                 transition-transform duration-300 ease-out
-                ${
-                  isMobileMenuOpen
+                ${isMobileMenuOpen
                     ? "max-md:translate-y-0 md:translate-x-0"
                     : "max-md:-translate-y-full md:translate-x-full"
-                }
+                  }
               `}
               >
                 {/* Header: Language + Close */}
@@ -278,12 +191,12 @@ export const Header: React.FC<HeaderProps> = ({
 
                     <div className="w-32 border-t border-white/20" />
 
-                    <Link
-                      href={"/history"}
+                    <span
+                      onClick={handleHistoryNavigate}
                       className="hover:text-gray-400 transition"
                     >
                       {t("Test History")}
-                    </Link>
+                    </span>
 
                     <div className="w-32 border-t border-white/20" />
 
@@ -318,7 +231,6 @@ export const Header: React.FC<HeaderProps> = ({
 
                         {(deviceType === "android" ||
                           deviceType === "other") && (
-                          <>
                             <a
                               href="https://play.google.com/store/apps/details?id=com.rma.myspeed&hl=en"
                               target="_blank"
@@ -330,8 +242,7 @@ export const Header: React.FC<HeaderProps> = ({
                                 className="w-22"
                               />
                             </a>
-                          </>
-                        )}
+                          )}
                       </div>
                     </div>
 
@@ -370,7 +281,7 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
                 </div>
               </div>
-            </>
+            </Fragment>
           )}
         </div>
 
@@ -379,35 +290,16 @@ export const Header: React.FC<HeaderProps> = ({
           onClose={() => setShowBlockerPopup(false)}
         />
       </header>
-
-      {/* === NEW APP STORE / GOOGLE PLAY STRIP === */}
-      {/* <AppDownloadPopup /> */}
     </Fragment>
   );
 };
 
-const AppDownloadPopup = () => {
+const AppDownloadPopup = ({ upLiftStore }: { upLiftStore: (showAppStrip: boolean) => void }) => {
   const t = useTranslation();
 
-  const [deviceType, setDeviceType] = useState<
-    "android" | "ios" | "other" | null
-  >(null);
   const [showAppStrip, setShowAppStrip] = useState(false);
 
-  useEffect(() => {
-    const ua = navigator.userAgent.toLowerCase();
-    if (ua.indexOf("android") > -1) {
-      setDeviceType("android");
-    } else if (
-      ua.indexOf("iphone") > -1 ||
-      ua.indexOf("ipad") > -1 ||
-      ua.indexOf("ipod") > -1
-    ) {
-      setDeviceType("ios");
-    } else {
-      setDeviceType("other");
-    }
-  }, []);
+  const { deviceType } = useDeviceType();
 
   useEffect(() => {
     const showAppStripSession = sessionStorage?.getItem("showAppStrip");
@@ -423,49 +315,57 @@ const AppDownloadPopup = () => {
     setShowAppStrip(false);
   };
 
+  const openUrl =
+    deviceType === "android" || deviceType === "other"
+      ? "https://play.google.com/store/apps/details?id=com.rma.myspeed&hl=en"
+      : deviceType === "ios" || deviceType === "other"
+        ? "https://apps.apple.com/in/app/trai-myspeed/id1129080754"
+        : null;
+
+  useEffect(() => {
+    upLiftStore(showAppStrip)
+  }, [showAppStrip]);
+
+  if (!showAppStrip) {
+    return null;
+  }
+
   return (
     <div
-      className={`fixed top-[8rem] left-0 right-0 z-40 transition-all duration-500 ease-in-out ${
-        showAppStrip
-          ? "translate-y-0 opacity-100"
-          : "-translate-y-full opacity-0"
-      }`}
+      className={`relative top-0 left-0 right-0 z-[9999] transition-all duration-500 ease-in-out ${showAppStrip
+        ? "translate-y-0 opacity-100"
+        : "-translate-y-full opacity-0"
+        }`}
     >
-      <div className="bg-darkSecondary text-white py-3 px-4 flex items-center justify-between gap-6 shadow-lg sm:hidden block">
-        <span className="text-sm font-medium">{t("Available on:")}</span>
-
+      <div className="bg-darkSecondary text-white py-3 px-4 flex items-center justify-between gap-3 shadow-lg sm:hidden">
         {/* Badges Container */}
-        <div className="flex gap-4">
-          {/* App Store Badge - Show if iOS or Other */}
-          {(deviceType === "ios" || deviceType === "other") && (
-            <a
-              href="https://apps.apple.com/in/app/trai-myspeed/id1129080754"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transform transition-transform hover:scale-105"
-            >
-              <Image src={AppStoreBadge} alt="Download on the App Store" />
-            </a>
-          )}
-
-          {/* Google Play Badge - Show if Android or Other */}
-          {(deviceType === "android" || deviceType === "other") && (
-            <a
-              href="https://play.google.com/store/apps/details?id=com.rma.myspeed&hl=en"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transform transition-transform hover:scale-105"
-            >
-              <Image src={GooglePlayBadge} alt="Get it on Google Play" />
-            </a>
-          )}
+        <div className="flex gap-2">
+          <Image src={traiLogo} alt="TRAI" className="h-8 w-auto" priority />
+          <div className="flex flex-col">
+            <p className="text-sm font-semibold line-clamp-1 m-0 p-0">
+              {t("Download MySpeed for Faster, Smarter Testing")}
+            </p>
+            <p className="text-[11px] m-0 line-clamp-1 p-0">
+              {t(
+                "Run trusted tests and understand your internet performance in seconds."
+              )}
+            </p>
+          </div>
         </div>
+        <div className="flex gap-2">
+          {openUrl ? (
+            <Link
+              href={openUrl}
+              className="block border py-1 px-3 rounded-full"
+            >
+              Open
+            </Link>
+          ) : null}
 
-        {/* Close Button */}
-        <div>
+          {/* Close Button */}
           <button
             onClick={onStripClose}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/20 transition-colors"
+            className="p-1 rounded-full hover:bg-white/20 transition-colors"
             aria-label="Close app promotion banner"
           >
             <X size={20} color="white" />

@@ -52,4 +52,5 @@ export type TestModalProps = {
   masterId?: number;
   masterUuid?: string;
   isLastTest?: boolean; // NEW: Indicates if this is the last test in continuous mode
+  setCurrentScenarioId?: (scenarioId: number | undefined) => void;
 };

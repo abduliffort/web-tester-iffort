@@ -117,7 +117,7 @@ const RenderCompletedResults = ({
           {
             label: t("Latency"),
             value: latency.toFixed(0),
-            unit: "MS",
+            unit: "ms",
             icon: <ArrowLeftRight size={iconClass} />,
           },
           {
