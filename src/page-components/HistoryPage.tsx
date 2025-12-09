@@ -2,11 +2,12 @@
 
 import { Header } from "@/components/Header";
 import { AboutPopup } from "@/components/AboutPopup";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import History from "@/components/history/history";
 
 const HistoryPage = () => {
   const [showAboutPopup, setShowAboutPopup] = useState(false);
+  const [isVisibleDownload, setIsVisibleDownload] = useState(false);
 
   const handleLogoClick = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -23,7 +24,13 @@ const HistoryPage = () => {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+  useEffect(() => {
+    console.log(isVisibleDownload);
+  }, [isVisibleDownload]);
 
+  const upLiftStore = (showAppStrip: boolean) => {
+    setIsVisibleDownload(showAppStrip);
+  };
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 w-full">
       {/* Header */}
@@ -33,6 +40,7 @@ const HistoryPage = () => {
         onNavigate={handleNavigate}
         onAboutClick={() => setShowAboutPopup(true)}
         extraCss="!fixed"
+        upLiftStore={upLiftStore}
       />
 
       {/* About Popup */}
@@ -48,7 +56,11 @@ const HistoryPage = () => {
             dark:bg-cover dark:bg-center dark:bg-no-repeat
             bg-fixed pt-16 w-full grid grid-cols-1 w-full h-full"
       >
-        <div className="max-w-7xl mx-auto w-full flex flex-col max-md:mt-[4rem] mt-[5rem] max-sm:mt-[2rem]">
+        <div
+          className={`max-w-7xl mx-auto w-full flex flex-col max-md:mt-[4rem] mt-[5rem] ${
+            isVisibleDownload ? "max-sm:mt-[5.5rem]" : "max-sm:mt-[2rem]"
+          }`}
+        >
           <History />
         </div>
       </section>

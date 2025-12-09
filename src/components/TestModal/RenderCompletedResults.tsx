@@ -157,9 +157,9 @@ const RenderCompletedResults = ({
   return (
     <div className="w-full max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex flex-row flex-wrap justify-center items-center gap-2 sm:gap-8 text-xs sm:text-sm mb-[5rem] uppercase tracking-wider">
+      <div className="flex flex-row flex-wrap justify-center items-center gap-2 sm:gap-8 mb-[5rem] max-sm:mb-[3.5rem] tracking-wider">
         <span className="text-white/50 text-size4 mr-2 sm:mr-0">
-          {t("DATE")}:{" "}
+          {t("Date")}:{" "}
           <span className="text-white text-size4">
             {formatDateTime(dateTime)}
           </span>
@@ -194,7 +194,7 @@ const RenderCompletedResults = ({
       </div>
 
       {/* Main Gradient Circle Results */}
-      <div className="flex justify-center gap-2 sm:gap-8 overflow-x-auto pb-4 max-sm:mx-3">
+      <div className="flex justify-center gap-2 sm:gap-8 overflow-x-auto pb-4 max-sm:mx-3 max-sm:pb-0">
         {resultCircles.map((item, index) => (
           <div
             key={index}

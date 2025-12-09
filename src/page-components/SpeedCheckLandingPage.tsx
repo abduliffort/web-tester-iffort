@@ -1,9 +1,11 @@
 "use client";
 
+
 import { TestModal } from "@/components/TestModal";
+import { TestModalHandle } from "@/components/TestModal/TestModal.types";
 import { Header } from "@/components/Header";
 import { AboutPopup } from "@/components/AboutPopup";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ENV_CONFIG } from "@/lib/constants";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Info, Video, Wifi, Zap } from "lucide-react";
@@ -26,6 +28,8 @@ const SpeedCheckLandingPage = () => {
   // const [showBackToTop, setShowBackToTop] = useState(false);
   const [showAboutPopup, setShowAboutPopup] = useState(false);
   const [showFlag, setShowFlag] = useState(false);
+
+  const testModalRef = useRef<TestModalHandle>(null);
 
   const [selectedTest, setSelectedTest] = useState<"internet" | "video">(
     "internet"
@@ -132,6 +136,13 @@ const SpeedCheckLandingPage = () => {
     setIsVisibleDownload(showAppStrip);
   };
 
+  const onStopFromHeader = () => {
+    // handleClose();
+    if (testModalRef.current) {
+      testModalRef.current.triggerStop();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 w-full">
       {/* Header */}
@@ -142,6 +153,7 @@ const SpeedCheckLandingPage = () => {
         onAboutClick={() => setShowAboutPopup(true)}
         extraCss="!fixed"
         upLiftStore={upLiftStore}
+        onStopFromHeader={onStopFromHeader}
       />
 
       {/* About Popup */}
@@ -163,6 +175,7 @@ const SpeedCheckLandingPage = () => {
         <div className="max-w-7xl mx-auto w-full flex flex-col max-md:mt-[4rem] max-lg:mt-[5rem] max-sm:mt-[0rem]">
           {currentScenarioId ? (
             <TestModal
+              ref={testModalRef}
               isOpen={true}
               onClose={handleClose}
               onCancelTest={handleCancelTest}
@@ -187,7 +200,7 @@ const SpeedCheckLandingPage = () => {
                   />
                 </div>
                 {/* Test Type Buttons – stacked on mobile */}
-                <div className="flex flex-row justify-between sm:justify-center sm:gap-3 gap-2 sm:gap-4 max-sm-mb-0 mb-24 px-6 sm:px-4 max-sm:flex-col max-sm:items-center max-sm:gap-4">
+                <div className="flex flex-row justify-between sm:justify-center sm:gap-3 gap-2 sm:gap-4 max-sm:mb-0 mb-24 px-6 sm:px-4 max-sm:flex-col max-sm:items-center max-sm:gap-4">
                   {[
                     {
                       id: "internet",
@@ -211,15 +224,13 @@ const SpeedCheckLandingPage = () => {
                       onClick={() =>
                         setSelectedTest(btn?.id as "internet" | "video")
                       }
-                      className={`flex-1 sm:flex-none ${
-                        btn?.id === "internet"
-                          ? "px-14 max-sm:px-20"
-                          : "px-6 max-sm:px-12"
-                      } py-3 rounded-full font-semibold transition-all shadow-lg flex items-center justify-center gap-2 sm:gap-3 text-size2 ${
-                        selectedTest === btn?.id
+                      className={`flex-1 sm:flex-none ${btn?.id === "internet"
+                        ? "px-14 max-sm:px-20"
+                        : "px-6 max-sm:px-12"
+                        } py-3 rounded-full font-semibold transition-all shadow-lg flex items-center justify-center gap-2 sm:gap-3 text-size2 ${selectedTest === btn?.id
                           ? btn?.className
                           : "bg-gray-200 dark:bg-black/50 text-gray-700 dark:text-white/50 hover:bg-gray-300 dark:hover:bg-white/20"
-                      }`}
+                        }`}
                     >
                       <span className="inline">{btn?.icon}</span>
 
@@ -236,17 +247,15 @@ const SpeedCheckLandingPage = () => {
               </div>
 
               {/* Middle: START Button – bigger tap target on mobile */}
-              <div className="flex items-center justify-center max-md:mb-[0rem] mb-[3rem] max-sm:mt-[4rem]">
+              <div className="flex items-center justify-center max-md:mb-[0rem] mb-[3rem] max-sm:my-[4rem]">
                 <div className="relative cursor-pointer group">
                   <div
-                    className={`absolute inset-0 rounded-full ${
-                      selectedTest === "video" ? "bg-darkPink" : "bg-darkYellow"
-                    } animate-[ping_2s_ease-out_infinite]`}
+                    className={`absolute inset-0 rounded-full ${selectedTest === "video" ? "bg-darkPink" : "bg-darkYellow"
+                      } animate-[ping_2s_ease-out_infinite]`}
                   ></div>
                   <div
-                    className={`absolute inset-0 rounded-full ${
-                      selectedTest === "video" ? "bg-darkPink" : "bg-darkYellow"
-                    } animate-[ping_2s_ease-out_infinite_1.5s]`}
+                    className={`absolute inset-0 rounded-full ${selectedTest === "video" ? "bg-darkPink" : "bg-darkYellow"
+                      } animate-[ping_2s_ease-out_infinite_1.5s]`}
                   ></div>
                   <div className="absolute inset-0 rounded-full bg-white/10 group-hover:opacity-30 transition-opacity"></div>
                   <div className="absolute inset-0 rounded-full bg-white/5 animate-pulse"></div>

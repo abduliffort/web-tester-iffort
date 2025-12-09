@@ -202,7 +202,6 @@ export const SpeedGauge: React.FC<SpeedGaugeProps> = ({
       {/* Divider Line (Refactored)
        */}
       {/* <hr className="text-white bg-white" /> */}
-      <hr className="w-full block sm:hidden" />
     </div>
   );
 };

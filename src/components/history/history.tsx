@@ -123,7 +123,7 @@ export default function HistoryPage() {
           <ChevronLeft size={20} />
           <span className="text-size3">{t("Back to Home")}</span>
         </Link>
-        <h1 className="text-size1 text-white text-center flex max-sm:mt-6">
+        <h1 className="text-size1 flex justify-center text-white text-center flex max-sm:mt-6">
           {t("Previous Test Results")}
         </h1>
         <div className="hidden md:block w-[120px]" />
@@ -132,7 +132,7 @@ export default function HistoryPage() {
       {/* Tabs + Filters */}
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 lg:gap-8 mb-8">
         {/* Tabs - Only Speed and Video & Browser */}
-        <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden lg:overflow-visible justify-start max-sm:justify-evenly gap-0 lg:gap-4 border-b border-gray-300 scrollbar-hide">
+        <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden lg:overflow-visible justify-start max-sm:justify-between gap-0 lg:gap-4 border-b border-gray-300 max-sm:border-none scrollbar-hide">
           {[
             { id: "speed", label: t("Speed Test") },
             { id: "video", label: t("Video & Browser Test") },
@@ -143,10 +143,12 @@ export default function HistoryPage() {
                 setActiveTab(tab.id as "speed" | "video");
                 setCurrentPage(1);
               }}
-              className={`flex-shrink-0 pb-2 sm:pb-4 px-3 text-size3 transition-colors border-b-4 -mb-px ${
+              className={`flex-shrink-0 pb-2 sm:pb-4 px-3 text-size3 transition-colors border-b-4 max-sm:border-b-3 -mb-px ${
+                "speed" === tab.id ? "max-sm:px-8" : "max-sm:px-4"
+              } ${
                 activeTab === tab.id
-                  ? "text-white border-white"
-                  : "text-white/50 border-transparent hover:text-white"
+                  ? "text-white border-white max-sm:border-b-4"
+                  : "text-white/50 border-transparent hover:text-white max-sm:border-white/70"
               }`}
             >
               {tab.label}
@@ -177,7 +179,7 @@ export default function HistoryPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <div className="overflow-x-auto md:overflow-visible">
           <table className="min-w-[820px] w-full text-sm md:text-[0.9rem]">
             <thead>
