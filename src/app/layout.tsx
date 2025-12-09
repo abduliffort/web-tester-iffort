@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import FlagWave from "@/components/Footer/Flag";
+import { NetworkToast } from "@/components/ui/NetworkToast";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -39,6 +40,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>{children}</Providers>
+        <NetworkToast />
       </body>
     </html>
   );

@@ -71,6 +71,13 @@ export default function HistoryPage() {
 
     return data;
   }, [results, selectedOperator, dateSort, activeTab]);
+  // Separate data checks
+  const hasSpeedData = results.some(
+    (r) => r.latency !== null || r.download !== null || r.upload !== null
+  );
+  const hasVideoData = results.some(
+    (r) => r.webBrowsing !== null || r.videoStreaming !== null
+  );
 
   const totalItems = processedData.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -129,196 +136,196 @@ export default function HistoryPage() {
         <div className="hidden md:block w-[120px]" />
       </div>
 
-      {/* Tabs + Filters */}
-      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 lg:gap-8 mb-8">
-        {/* Tabs - Only Speed and Video & Browser */}
-        <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden lg:overflow-visible justify-start max-sm:justify-between gap-0 lg:gap-4 border-b border-gray-300 max-sm:border-none scrollbar-hide">
-          {[
-            { id: "speed", label: t("Speed Test") },
-            { id: "video", label: t("Video & Browser Test") },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id as "speed" | "video");
-                setCurrentPage(1);
-              }}
-              className={`flex-shrink-0 pb-2 sm:pb-4 px-3 text-size3 transition-colors border-b-4 max-sm:border-b-3 -mb-px ${
-                "speed" === tab.id ? "max-sm:px-8" : "max-sm:px-4"
-              } ${
-                activeTab === tab.id
-                  ? "text-white border-white max-sm:border-b-4"
-                  : "text-white/50 border-transparent hover:text-white max-sm:border-white/70"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+      {hasSpeedData || hasVideoData ? (
+        <>
+          {/* Tabs + Filters */}
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 lg:gap-8 mb-8">
+            {/* Tabs */}
+            <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden lg:overflow-visible justify-start max-sm:justify-between gap-0 lg:gap-4 border-b border-gray-300 max-sm:border-none scrollbar-hide">
+              {[
+                { id: "speed", label: t("Speed Test") },
+                { id: "video", label: t("Video & Browser Test") },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id as "speed" | "video");
+                    setCurrentPage(1);
+                  }}
+                  className={`flex-shrink-0 pb-2 sm:pb-4 px-3 text-size3 transition-colors border-b-4 max-sm:border-b-3 -mb-px ${
+                    "speed" === tab.id ? "max-sm:px-8" : "max-sm:px-4"
+                  } ${
+                    activeTab === tab.id
+                      ? "text-white border-white max-sm:border-b-4"
+                      : "text-white/50 border-transparent hover:text-white max-sm:border-white/70"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
 
-        {/* Date Sort */}
-        <div className="flex flex-row flex-nowrap justify-center sm:justify-end gap-2 sm:gap-3">
-          <div className="relative inline-block">
-            <select
-              value={dateSort}
-              onChange={(e) => {
-                setDateSort(e.target.value as any);
-                setCurrentPage(1);
-              }}
-              className="appearance-none pl-3 sm:pl-4 pr-10 sm:pr-12 py-2 border border-white/50 rounded-full text-white focus:outline-none focus:border-white/50 bg-darkPrimary text-size3 leading-tight"
-            >
-              <option value="newest">{t("Date & Time (Newest First)")}</option>
-              <option value="oldest">{t("Date & Time (Oldest First)")}</option>
-            </select>
-            <ChevronDown
-              size={18}
-              className="pointer-events-none absolute right-3 sm:right-4 top-1/2 -translate-y-[45%] text-gray-400"
-            />
+            {/* Date Sort */}
+            <div className="flex flex-row flex-nowrap justify-center sm:justify-end gap-2 sm:gap-3">
+              <div className="relative inline-block">
+                <select
+                  value={dateSort}
+                  onChange={(e) => {
+                    setDateSort(e.target.value as any);
+                    setCurrentPage(1);
+                  }}
+                  className="appearance-none pl-3 sm:pl-4 pr-10 sm:pr-12 py-2 border border-white/50 rounded-full text-white focus:outline-none focus:border-white/50 bg-darkPrimary text-size3 leading-tight"
+                >
+                  <option value="newest">
+                    {t("Date & Time (Newest First)")}
+                  </option>
+                  <option value="oldest">
+                    {t("Date & Time (Oldest First)")}
+                  </option>
+                </select>
+                <ChevronDown
+                  size={18}
+                  className="pointer-events-none absolute right-3 sm:right-4 top-1/2 -translate-y-[45%] text-gray-400"
+                />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="overflow-x-auto md:overflow-visible">
-          <table className="min-w-[820px] w-full text-sm md:text-[0.9rem]">
-            <thead>
-              <tr className="bg-darkYellow text-darkBlue">
-                <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
-                  {t("Date & Time")}
-                </th>
-                <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
-                  {t("Network Type")}
-                </th>
-                <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
-                  {t("Test ID")}
-                </th>
-
-                {showSpeedColumns && (
-                  <>
+          {/* Table */}
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="overflow-x-auto md:overflow-visible">
+              <table className="min-w-[820px] w-full text-sm md:text-[0.9rem]">
+                <thead>
+                  <tr className="bg-darkYellow text-darkBlue">
                     <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
-                      {t("Latency (ms)")}
+                      {t("Date & Time")}
                     </th>
                     <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
-                      {t("Download (Mbps)")}
+                      {t("Network Type")}
                     </th>
                     <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
-                      {t("Upload (Mbps)")}
+                      {t("Test ID")}
                     </th>
-                  </>
-                )}
-
-                {showDelayColumns && (
-                  <>
-                    <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
-                      {t("Web Browsing Delay (Sec)")}
-                    </th>
-                    <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue last:border-r-0">
-                      {t("Video Streaming Delay (Sec)")}
-                    </th>
-                  </>
-                )}
-              </tr>
-            </thead>
-
-            <tbody className="bg-[#1F2937] text-white">
-              {paginated.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={showSpeedColumns ? 6 : 5}
-                    className="text-center py-16 text-gray-500"
-                  >
-                    {t("No results found")}
-                  </td>
-                </tr>
-              ) : (
-                paginated.map((r, i) => (
-                  <tr key={r.testId + i} className="border-t border-gray-200">
-                    <td className="px-3 md:px-6 py-4 text-size4">
-                      {r.dateTime}
-                    </td>
-                    <td className="px-3 md:px-6 py-4 text-size4">
-                      {formatNetwork(r.networkType)}
-                    </td>
-                    <td className="px-3 md:px-6 py-4 text-size4">{r.testId}</td>
 
                     {showSpeedColumns && (
                       <>
-                        <td className="px-3 md:px-6 py-4 text-size4">
-                          {formatValue(r.latency)}
-                        </td>
-                        <td className="px-3 md:px-6 py-4 text-size4">
-                          {formatValue(r.download)}
-                        </td>
-                        <td className="px-3 md:px-6 py-4 text-size4">
-                          {formatValue(r.upload)}
-                        </td>
+                        <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
+                          {t("Latency (ms)")}
+                        </th>
+                        <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
+                          {t("Download (Mbps)")}
+                        </th>
+                        <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
+                          {t("Upload (Mbps)")}
+                        </th>
                       </>
                     )}
 
                     {showDelayColumns && (
                       <>
-                        <td className="px-3 md:px-6 py-4 text-size4">
-                          {formatDelay(r.webBrowsing)}
-                        </td>
-                        <td className="px-3 md:px-6 py-4 text-size4">
-                          {formatDelay(r.videoStreaming)}
-                        </td>
+                        <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
+                          {t("Web Browsing Delay (Sec)")}
+                        </th>
+                        <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue last:border-r-0">
+                          {t("Video Streaming Delay (Sec)")}
+                        </th>
                       </>
                     )}
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                </thead>
 
-      {/* Pagination - unchanged */}
-      {processedData.length > 0 && (
-        <Fragment>
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3 my-6 text-xs sm:text-sm hidden md:flex">
-            <TotalItems t={t} totalItems={totalItems} />
-            <Paginations
-              setCurrentPage={setCurrentPage}
-              currentPage={currentPage}
-              totalPages={totalPages}
-            />
-            <PerPage
-              t={t}
-              itemsPerPage={itemsPerPage}
-              setItemsPerPage={setItemsPerPage}
-              setCurrentPage={setCurrentPage}
-              totalPages={totalPages}
-              gotoInput={gotoInput}
-              setGotoInput={setGotoInput}
-              handleGoto={handleGoto}
-              currentPage={currentPage}
-            />
-          </div>
+                <tbody className="bg-[#1F2937] text-white">
+                  {paginated.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={showSpeedColumns ? 6 : 5}
+                        className="text-center py-16 text-gray-500"
+                      >
+                        {t("No results found")}
+                      </td>
+                    </tr>
+                  ) : (
+                    paginated.map((r, i) => (
+                      <tr
+                        key={r.testId + i}
+                        className="border-t border-gray-200"
+                      >
+                        <td className="px-3 md:px-6 py-4 text-size4">
+                          {r.dateTime}
+                        </td>
+                        <td className="px-3 md:px-6 py-4 text-size4">
+                          {formatNetwork(r.networkType)}
+                        </td>
+                        <td className="px-3 md:px-6 py-4 text-size4">
+                          {r.testId}
+                        </td>
 
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3 my-6 text-xs sm:text-sm md:hidden">
-            <Paginations
-              setCurrentPage={setCurrentPage}
-              currentPage={currentPage}
-              totalPages={totalPages}
-            />
-            <div className="order-2 md:order-1 flex w-full md:w-auto justify-between items-center sm:gap-6 gap-[2rem] text-white">
-              <TotalItems t={t} totalItems={totalItems} />
-              <PerPage
-                t={t}
-                itemsPerPage={itemsPerPage}
-                setItemsPerPage={setItemsPerPage}
-                setCurrentPage={setCurrentPage}
-                totalPages={totalPages}
-                gotoInput={gotoInput}
-                setGotoInput={setGotoInput}
-                handleGoto={handleGoto}
-                currentPage={currentPage}
-              />
+                        {showSpeedColumns && (
+                          <>
+                            <td className="px-3 md:px-6 py-4 text-size4">
+                              {formatValue(r.latency)}
+                            </td>
+                            <td className="px-3 md:px-6 py-4 text-size4">
+                              {formatValue(r.download)}
+                            </td>
+                            <td className="px-3 md:px-6 py-4 text-size4">
+                              {formatValue(r.upload)}
+                            </td>
+                          </>
+                        )}
+
+                        {showDelayColumns && (
+                          <>
+                            <td className="px-3 md:px-6 py-4 text-size4">
+                              {formatDelay(r.webBrowsing)}
+                            </td>
+                            <td className="px-3 md:px-6 py-4 text-size4">
+                              {formatDelay(r.videoStreaming)}
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
-        </Fragment>
+
+          {/* Pagination */}
+          {processedData.length > 0 && (
+            <Fragment>
+              <div className="flex flex-col md:flex-row items-center justify-between gap-3 my-6 text-xs sm:text-sm hidden md:flex">
+                <TotalItems t={t} totalItems={totalItems} />
+                <Paginations
+                  setCurrentPage={setCurrentPage}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                />
+                <PerPage
+                  t={t}
+                  itemsPerPage={itemsPerPage}
+                  setItemsPerPage={setItemsPerPage}
+                  setCurrentPage={setCurrentPage}
+                  totalPages={totalPages}
+                  gotoInput={gotoInput}
+                  setGotoInput={setGotoInput}
+                  handleGoto={handleGoto}
+                  currentPage={currentPage}
+                />
+              </div>
+            </Fragment>
+          )}
+        </>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-32 text-center text-white/70">
+          <p className="text-size2 font-semibold mb-2">
+            {t("No test results available")}
+          </p>
+          <p className="text-size4">
+            {t("Run a test to see your internet performance history here.")}
+          </p>
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,5 @@
 "use client";
 
-
 import { TestModal } from "@/components/TestModal";
 import { TestModalHandle } from "@/components/TestModal/TestModal.types";
 import { Header } from "@/components/Header";
@@ -224,13 +223,15 @@ const SpeedCheckLandingPage = () => {
                       onClick={() =>
                         setSelectedTest(btn?.id as "internet" | "video")
                       }
-                      className={`flex-1 sm:flex-none ${btn?.id === "internet"
-                        ? "px-14 max-sm:px-20"
-                        : "px-6 max-sm:px-12"
-                        } py-3 rounded-full font-semibold transition-all shadow-lg flex items-center justify-center gap-2 sm:gap-3 text-size2 ${selectedTest === btn?.id
+                      className={`flex-1 sm:flex-none ${
+                        btn?.id === "internet"
+                          ? "px-14 max-sm:px-20"
+                          : "px-6 max-sm:px-12"
+                      } py-3 rounded-full font-semibold transition-all shadow-lg flex items-center justify-center gap-2 sm:gap-3 text-size2 ${
+                        selectedTest === btn?.id
                           ? btn?.className
                           : "bg-gray-200 dark:bg-black/50 text-gray-700 dark:text-white/50 hover:bg-gray-300 dark:hover:bg-white/20"
-                        }`}
+                      }`}
                     >
                       <span className="inline">{btn?.icon}</span>
 
@@ -250,12 +251,14 @@ const SpeedCheckLandingPage = () => {
               <div className="flex items-center justify-center max-md:mb-[0rem] mb-[3rem] max-sm:my-[4rem]">
                 <div className="relative cursor-pointer group">
                   <div
-                    className={`absolute inset-0 rounded-full ${selectedTest === "video" ? "bg-darkPink" : "bg-darkYellow"
-                      } animate-[ping_2s_ease-out_infinite]`}
+                    className={`absolute inset-0 rounded-full ${
+                      selectedTest === "video" ? "bg-darkPink" : "bg-darkYellow"
+                    } animate-[ping_2s_ease-out_infinite]`}
                   ></div>
                   <div
-                    className={`absolute inset-0 rounded-full ${selectedTest === "video" ? "bg-darkPink" : "bg-darkYellow"
-                      } animate-[ping_2s_ease-out_infinite_1.5s]`}
+                    className={`absolute inset-0 rounded-full ${
+                      selectedTest === "video" ? "bg-darkPink" : "bg-darkYellow"
+                    } animate-[ping_2s_ease-out_infinite_1.5s]`}
                   ></div>
                   <div className="absolute inset-0 rounded-full bg-white/10 group-hover:opacity-30 transition-opacity"></div>
                   <div className="absolute inset-0 rounded-full bg-white/5 animate-pulse"></div>

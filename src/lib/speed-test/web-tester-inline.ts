@@ -275,7 +275,7 @@ export class WebTesterInline {
           fontSize: "14px",
           fontWeight: "600",
           borderRadius: "0 0 0 8px",
-          zIndex: "100",
+          zIndex: "20",
           boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
         });
         successOverlay.innerHTML = `✓ Loaded in ${browsingDelay.toFixed(0)}ms`;
@@ -461,7 +461,7 @@ export class WebTesterInline {
           fontSize: "14px",
           fontWeight: "600",
           borderRadius: "0 0 0 8px",
-          zIndex: "100",
+          zIndex: "20",
           boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
         });
         successOverlay.innerHTML = `✓ Loaded in ${browsingDelay.toFixed(0)}ms`;
@@ -585,7 +585,7 @@ export class WebTesterInline {
           fontSize: "14px",
           fontWeight: "600",
           borderRadius: "0 0 0 8px",
-          zIndex: "100",
+          zIndex: "20",
         });
         successOverlay.innerHTML = `✓ Loaded in ${browsingDelay.toFixed(0)}ms`;
         webContainer.appendChild(successOverlay);
@@ -1507,7 +1507,7 @@ export class WebTesterInline {
         fontSize: "14px",
         fontWeight: "600",
         borderRadius: "0 0 0 8px",
-        zIndex: "100",
+        zIndex: "20",
         boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
       });
       successOverlay.innerHTML = `✓ Loaded in ${browsingDelay.toFixed(0)}ms`;

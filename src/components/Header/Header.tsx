@@ -17,7 +17,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { StopTestConfirmation } from "../TestModal/StopTestConfirmation";
-
+import { usePathname } from "next/navigation";
 interface HeaderProps {
   onLogoClick?: () => void;
   showBackButton?: boolean;
@@ -61,15 +61,19 @@ export const Header: React.FC<HeaderProps> = ({
   isTestRunning = false,
   onAboutClick,
   extraCss,
-  upLiftStore, onStopFromHeader
+  upLiftStore,
+  onStopFromHeader,
 }) => {
   const { deviceType } = useDeviceType();
   const router = useRouter();
+  const pathname = usePathname();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showBlockerPopup, setShowBlockerPopup] = useState(false);
   const [showStopConfirmation, setShowStopConfirmation] = useState(false);
-  const [onStopFromHeaderCallback, setOnStopFromHeaderCallback] = useState<(() => void) | undefined>(undefined);
+  const [onStopFromHeaderCallback, setOnStopFromHeaderCallback] = useState<
+    (() => void) | undefined
+  >(undefined);
 
   const t = useTranslation();
 
@@ -156,10 +160,11 @@ export const Header: React.FC<HeaderProps> = ({
             <Fragment>
               {/* Dark Overlay */}
               <div
-                className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${isMobileMenuOpen
-                  ? "opacity-100"
-                  : "opacity-0 pointer-events-none"
-                  }`}
+                className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
+                  isMobileMenuOpen
+                    ? "opacity-100"
+                    : "opacity-0 pointer-events-none"
+                }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               />
 
@@ -169,10 +174,11 @@ export const Header: React.FC<HeaderProps> = ({
                 fixed top-0 right-0 md:bottom-0 w-full md:w-[30%] bg-darkPrimary text-white z-50
                 flex flex-col
                 transition-transform duration-300 ease-out
-                ${isMobileMenuOpen
+                ${
+                  isMobileMenuOpen
                     ? "max-md:translate-y-0 md:translate-x-0 h-full"
                     : "max-md:-translate-y-full md:translate-x-full"
-                  }
+                }
               `}
               >
                 {/* Header: Language + Close */}
@@ -222,7 +228,12 @@ export const Header: React.FC<HeaderProps> = ({
                     <Link
                       href={"/"}
                       onClick={handleLogoClick}
-                      className="hover:text-gray-400 transition text-size2 text-white/80"
+                      className={cn(
+                        "hover:text-gray-400 transition text-size2",
+                        pathname === "/"
+                          ? "text-darkYellow font-semibold"
+                          : "text-white/80"
+                      )}
                     >
                       {t("Home")}
                     </Link>
@@ -233,7 +244,12 @@ export const Header: React.FC<HeaderProps> = ({
                         onAboutClick?.();
                         setIsMobileMenuOpen(false);
                       }}
-                      className="hover:text-gray-400 transition text-size2 text-white/80"
+                      className={cn(
+                        "hover:text-gray-400 transition text-size2",
+                        pathname === "/about"
+                          ? "text-darkYellow font-semibold"
+                          : "text-white/80"
+                      )}
                     >
                       {t("About")}
                     </button>
@@ -242,14 +258,26 @@ export const Header: React.FC<HeaderProps> = ({
 
                     <span
                       onClick={handleHistoryNavigate}
-                      className="hover:text-gray-400 transition text-size2 text-white/80 cursor-pointer"
+                      className={cn(
+                        "hover:text-gray-400 transition text-size2 cursor-pointer",
+                        pathname === "/history"
+                          ? "text-darkYellow font-semibold"
+                          : "text-white/80"
+                      )}
                     >
                       {t("Test History")}
                     </span>
 
                     <div className="w-32 border-t border-white/20" />
 
-                    <button className="hover:text-gray-400 transition text-size2 text-white/80">
+                    <button
+                      className={cn(
+                        "hover:text-gray-400 transition text-size2",
+                        pathname === "/faq"
+                          ? "text-darkYellow font-semibold"
+                          : "text-white/80"
+                      )}
+                    >
                       {t("FAQs")}
                     </button>
                   </div>
@@ -283,18 +311,18 @@ export const Header: React.FC<HeaderProps> = ({
 
                           {(deviceType === "android" ||
                             deviceType === "other") && (
-                              <a
-                                href="https://play.google.com/store/apps/details?id=com.rma.myspeed&hl=en"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <Image
-                                  src={GooglePlayBadge}
-                                  alt="Google Play"
-                                  className="w-[7rem]"
-                                />
-                              </a>
-                            )}
+                            <a
+                              href="https://play.google.com/store/apps/details?id=com.rma.myspeed&hl=en"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Image
+                                src={GooglePlayBadge}
+                                alt="Google Play"
+                                className="w-[7rem]"
+                              />
+                            </a>
+                          )}
                         </div>
                       </div>
 
@@ -338,11 +366,11 @@ export const Header: React.FC<HeaderProps> = ({
         <StopTestConfirmation
           isOpen={showStopConfirmation}
           onConfirm={() => {
-            onStopFromHeader?.()
+            onStopFromHeader?.();
 
-            setShowStopConfirmation(false)
+            setShowStopConfirmation(false);
 
-            onStopFromHeaderCallback?.()
+            onStopFromHeaderCallback?.();
           }}
           onCancel={() => setShowStopConfirmation(false)}
         />
@@ -386,8 +414,8 @@ const AppDownloadPopup = ({
     deviceType === "android" || deviceType === "other"
       ? "https://play.google.com/store/apps/details?id=com.rma.myspeed&hl=en"
       : deviceType === "ios" || deviceType === "other"
-        ? "https://apps.apple.com/in/app/trai-myspeed/id1129080754"
-        : null;
+      ? "https://apps.apple.com/in/app/trai-myspeed/id1129080754"
+      : null;
 
   useEffect(() => {
     upLiftStore?.(showAppStrip);
@@ -399,10 +427,11 @@ const AppDownloadPopup = ({
 
   return (
     <div
-      className={`relative top-0 left-0 right-0 z-99 transition-all duration-500 ease-in-out ${showAppStrip
-        ? "translate-y-0 opacity-100"
-        : "-translate-y-full opacity-0"
-        }`}
+      className={`relative top-0 left-0 right-0 z-99 transition-all duration-500 ease-in-out ${
+        showAppStrip
+          ? "translate-y-0 opacity-100"
+          : "-translate-y-full opacity-0"
+      }`}
     >
       <div className="bg-darkSecondary text-white py-3 px-4 flex items-center justify-between gap-3 shadow-lg lg:hidden">
         {/* Badges Container */}

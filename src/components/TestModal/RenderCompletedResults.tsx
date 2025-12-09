@@ -194,7 +194,7 @@ const RenderCompletedResults = ({
       </div>
 
       {/* Main Gradient Circle Results */}
-      <div className="flex justify-center gap-2 sm:gap-8 overflow-x-auto pb-4 max-sm:mx-3 max-sm:pb-0">
+      <div className="flex justify-center gap-2 sm:gap-8 overflow-x-auto pb-4 max-sm:mx-3 max-sm:pb-4">
         {resultCircles.map((item, index) => (
           <div
             key={index}
