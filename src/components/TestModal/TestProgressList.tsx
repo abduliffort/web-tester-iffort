@@ -32,14 +32,18 @@ export const TestProgressList: React.FC<TestProgressListProps> = ({
   const isInitializing = currentStep === "initializing";
 
   const getLucideIcon = (label: string) => {
-    const iconSize = "clamp(16px, 3vw, 24px)";
-    if (label.includes("Latency")) return <ArrowLeftRight size={iconSize} />;
-    if (label.includes("Download")) return <Download size={iconSize} />;
-    if (label.includes("Upload")) return <Upload size={iconSize} />;
-    if (label.includes("Web")) return <Globe size={iconSize} />;
+    const iconSize = "clamp(16px, 3vw, 20px)";
+    if (label.includes("Latency"))
+      return <ArrowLeftRight size={iconSize} className="text-white/70" />;
+    if (label.includes("Download"))
+      return <Download size={iconSize} className="text-white/70" />;
+    if (label.includes("Upload"))
+      return <Upload size={iconSize} className="text-white/70" />;
+    if (label.includes("Web"))
+      return <Globe size={iconSize} className="text-white/70" />;
     if (label.includes("Video") || label.includes("Streaming"))
-      return <Video size={iconSize} />;
-    return <Clock size={iconSize} />;
+      return <Video size={iconSize} className="text-white/70" />;
+    return <Clock size={iconSize} className="text-white/70" />;
   };
 
   const formatValue = (label: string, value: any, unit: string) => {
@@ -51,7 +55,7 @@ export const TestProgressList: React.FC<TestProgressListProps> = ({
       const seconds = Number(value) / 1000;
       return {
         displayValue: seconds.toFixed(2), // ✅ two decimal places
-        displayUnit: "Second",
+        displayUnit: "Seconds",
       };
     }
 
@@ -108,17 +112,15 @@ export const TestProgressList: React.FC<TestProgressListProps> = ({
             <div
               className={`relative w-20 h-20 sm:w-28 sm:h-28 rounded-full flex flex-col items-center justify-center ${circleBgClass} ${statusRing}`}
             >
-              <span className="text-sm sm:text-lg font-semibold tracking-tight select-none dark:text-black">
+              <span className="text-size1 tracking-tight select-none dark:text-darkBlack">
                 {displayValue}
               </span>
-              <span className="text-[0.6rem] sm:text-xs mt-1 text-black font-medium">
-                {displayUnit}
-              </span>
+              <span className="text-size4 text-darkBlack">{displayUnit}</span>
             </div>
 
             {/* Label */}
             <div className="mt-2 sm:mt-3">
-              <div className="text-[0.8rem] sm:text-[1.12rem] flex items-center gap-1 sm:gap-2 font-medium justify-center truncate">
+              <div className="text-size2 flex items-center gap-1 sm:gap-2 justify-center truncate">
                 {getLucideIcon(test.label)}
                 {test.label}
               </div>

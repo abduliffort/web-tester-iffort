@@ -9,8 +9,10 @@ const FlagWave = () => {
   return (
     <>
       {/* Desktop view unchanged */}
-      <div className="sm:flex flex-col jutify-end items-end fixed bottom-[7rem] max-md:bottom-[10rem] right-4 gap-4 max-sm:gap-2 max-sm:relative max-sm:w-full max-sm:flex-row max-sm:justify-evenly max-sm:items-center max-sm:px-4 max-sm:bottom-[3.3rem] max-sm:mx-4 hidden">
-        <span className="max-sm:text-center">Available on-</span>
+      <div className="sm:flex flex-col items-center jutify-end items-end fixed bottom-[9rem] max-md:bottom-[10rem] right-4 gap-4 max-sm:gap-2 max-sm:relative max-sm:w-full max-sm:flex-row max-sm:justify-evenly max-sm:items-center max-sm:px-4 max-sm:bottom-[3.3rem] max-sm:mx-4 hidden">
+        <span className="max-sm:text-center text-size4 text-white/50">
+          Available on:
+        </span>
 
         {(deviceType === "ios" || deviceType === "other") && (
           <a
@@ -18,7 +20,7 @@ const FlagWave = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Image src={AppStoreBadge} alt="App Store" className="w-22" />
+            <Image src={AppStoreBadge} alt="App Store" className="w-[6rem]" />
           </a>
         )}
 
@@ -28,7 +30,11 @@ const FlagWave = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Image src={GooglePlayBadge} alt="Google Play" className="w-22" />
+            <Image
+              src={GooglePlayBadge}
+              alt="Google Play"
+              className="w-[6rem]"
+            />
           </a>
         )}
       </div>

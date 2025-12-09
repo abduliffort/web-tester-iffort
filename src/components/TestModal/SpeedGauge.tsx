@@ -109,7 +109,7 @@ export const SpeedGauge: React.FC<SpeedGaugeProps> = ({
   }, [maxSpeed]);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full relative">
+    <div className="flex flex-col items-center justify-center w-full relative max-sm:mt-[2.5rem]">
       {/* Container for the Gauge + Overlays 
         Using aspect-ratio ensures the SVG overlay and the MUI Canvas 
         scale at the exact same rate.

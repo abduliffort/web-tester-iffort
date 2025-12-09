@@ -48,7 +48,7 @@ const HistoryPage = () => {
             dark:bg-cover dark:bg-center dark:bg-no-repeat
             bg-fixed pt-16 w-full grid grid-cols-1 w-full h-full"
       >
-        <div className="max-w-7xl mx-auto w-full flex flex-col max-md:mt-[4rem] mt-[5rem] max-sm:mt-[5rem]">
+        <div className="max-w-7xl mx-auto w-full flex flex-col max-md:mt-[4rem] mt-[5rem] max-sm:mt-[2rem]">
           <History />
         </div>
       </section>

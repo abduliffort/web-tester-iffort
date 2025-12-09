@@ -121,9 +121,9 @@ export default function HistoryPage() {
           className="flex items-center gap-2 text-white font-semibold text-sm sm:text-base"
         >
           <ChevronLeft size={20} />
-          <span>{t("Back to Home")}</span>
+          <span className="text-size3">{t("Back to Home")}</span>
         </Link>
-        <h1 className="text-lg sm:text-xl md:text-[1.4rem] font-semibold text-white text-center">
+        <h1 className="text-size1 text-white text-center flex max-sm:mt-6">
           {t("Previous Test Results")}
         </h1>
         <div className="hidden md:block w-[120px]" />
@@ -132,7 +132,7 @@ export default function HistoryPage() {
       {/* Tabs + Filters */}
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 lg:gap-8 mb-8">
         {/* Tabs - Only Speed and Video & Browser */}
-        <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden lg:overflow-visible justify-start gap-0 lg:gap-4 border-b border-gray-300 scrollbar-hide">
+        <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden lg:overflow-visible justify-start max-sm:justify-evenly gap-0 lg:gap-4 border-b border-gray-300 scrollbar-hide">
           {[
             { id: "speed", label: t("Speed Test") },
             { id: "video", label: t("Video & Browser Test") },
@@ -143,7 +143,7 @@ export default function HistoryPage() {
                 setActiveTab(tab.id as "speed" | "video");
                 setCurrentPage(1);
               }}
-              className={`flex-shrink-0 pb-2 sm:pb-4 px-3 text-sm sm:text-[0.9rem] font-medium transition-colors border-b-4 -mb-px ${
+              className={`flex-shrink-0 pb-2 sm:pb-4 px-3 text-size3 transition-colors border-b-4 -mb-px ${
                 activeTab === tab.id
                   ? "text-white border-white"
                   : "text-white/50 border-transparent hover:text-white"
@@ -163,7 +163,7 @@ export default function HistoryPage() {
                 setDateSort(e.target.value as any);
                 setCurrentPage(1);
               }}
-              className="appearance-none pl-3 sm:pl-4 pr-10 sm:pr-12 py-2 border border-white/50 rounded-full text-white focus:outline-none focus:border-white/50 bg-darkPrimary text-xs sm:text-base leading-tight"
+              className="appearance-none pl-3 sm:pl-4 pr-10 sm:pr-12 py-2 border border-white/50 rounded-full text-white focus:outline-none focus:border-white/50 bg-darkPrimary text-size3 leading-tight"
             >
               <option value="newest">{t("Date & Time (Newest First)")}</option>
               <option value="oldest">{t("Date & Time (Oldest First)")}</option>
@@ -182,25 +182,25 @@ export default function HistoryPage() {
           <table className="min-w-[820px] w-full text-sm md:text-[0.9rem]">
             <thead>
               <tr className="bg-darkYellow text-darkBlue">
-                <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
                   {t("Date & Time")}
                 </th>
-                <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
                   {t("Network Type")}
                 </th>
-                <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
                   {t("Test ID")}
                 </th>
 
                 {showSpeedColumns && (
                   <>
-                    <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                    <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
                       {t("Latency (ms)")}
                     </th>
-                    <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                    <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
                       {t("Download (Mbps)")}
                     </th>
-                    <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                    <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
                       {t("Upload (Mbps)")}
                     </th>
                   </>
@@ -208,10 +208,10 @@ export default function HistoryPage() {
 
                 {showDelayColumns && (
                   <>
-                    <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue">
+                    <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue">
                       {t("Web Browsing Delay (Sec)")}
                     </th>
-                    <th className="px-3 md:px-6 py-4 text-left font-medium border-r border-darkBlue last:border-r-0">
+                    <th className="px-3 md:px-6 py-4 text-left text-size4 border-r border-darkBlue last:border-r-0">
                       {t("Video Streaming Delay (Sec)")}
                     </th>
                   </>
@@ -232,21 +232,23 @@ export default function HistoryPage() {
               ) : (
                 paginated.map((r, i) => (
                   <tr key={r.testId + i} className="border-t border-gray-200">
-                    <td className="px-3 md:px-6 py-4">{r.dateTime}</td>
-                    <td className="px-3 md:px-6 py-4">
+                    <td className="px-3 md:px-6 py-4 text-size4">
+                      {r.dateTime}
+                    </td>
+                    <td className="px-3 md:px-6 py-4 text-size4">
                       {formatNetwork(r.networkType)}
                     </td>
-                    <td className="px-3 md:px-6 py-4">{r.testId}</td>
+                    <td className="px-3 md:px-6 py-4 text-size4">{r.testId}</td>
 
                     {showSpeedColumns && (
                       <>
-                        <td className="px-3 md:px-6 py-4">
+                        <td className="px-3 md:px-6 py-4 text-size4">
                           {formatValue(r.latency)}
                         </td>
-                        <td className="px-3 md:px-6 py-4">
+                        <td className="px-3 md:px-6 py-4 text-size4">
                           {formatValue(r.download)}
                         </td>
-                        <td className="px-3 md:px-6 py-4">
+                        <td className="px-3 md:px-6 py-4 text-size4">
                           {formatValue(r.upload)}
                         </td>
                       </>
@@ -254,10 +256,10 @@ export default function HistoryPage() {
 
                     {showDelayColumns && (
                       <>
-                        <td className="px-3 md:px-6 py-4">
+                        <td className="px-3 md:px-6 py-4 text-size4">
                           {formatDelay(r.webBrowsing)}
                         </td>
-                        <td className="px-3 md:px-6 py-4">
+                        <td className="px-3 md:px-6 py-4 text-size4">
                           {formatDelay(r.videoStreaming)}
                         </td>
                       </>
@@ -404,7 +406,7 @@ const TotalItems = ({
   t: (key: string) => string;
   totalItems: number;
 }) => (
-  <div className="font-medium text-base sm:text-base">
+  <div className="text-size3">
     {t("Total ")}
     {totalItems} {t(`item${totalItems === 1 ? "" : "s"}`)}
   </div>
@@ -438,23 +440,15 @@ const PerPage = ({
         setItemsPerPage(+e.target.value);
         setCurrentPage(1);
       }}
-      className="px-2 sm:px-3 py-1.5 sm:py-2 bg-transparent border border-white text-white rounded-lg text-xs sm:text-sm"
+      className="px-2 sm:px-3 py-1.5 sm:py-2 bg-darkPrimary border border-white text-white rounded-lg text-size4"
     >
-      <option value={10} className="text-darkBlue hover:bg-darkPrimary">
-        10 / page
-      </option>
-      <option value={15} className="text-darkBlue hover:bg-darkPrimary">
-        15 / page
-      </option>
-      <option value={20} className="text-darkBlue hover:bg-darkPrimary">
-        20 / page
-      </option>
-      <option value={50} className="text-darkBlue hover:bg-darkPrimary">
-        50 / page
-      </option>
+      <option value={10}>10 / page</option>
+      <option value={15}>15 / page</option>
+      <option value={20}>20 / page</option>
+      <option value={50}>50 / page</option>
     </select>
     <div className="flex items-center gap-1 sm:gap-2">
-      <span>Go to</span>
+      <span className="text-size4">Go to</span>
       <input
         type="number"
         min="1"
@@ -463,7 +457,7 @@ const PerPage = ({
         onChange={(e) => setGotoInput(e.target.value)}
         onKeyDown={handleGoto}
         placeholder={currentPage.toString()}
-        className="w-10 sm:w-16 px-2 py-1.5 sm:py-2 bg-transparent border border-white text-white rounded-lg text-center text-xs sm:text-sm"
+        className="w-10 sm:w-16 px-2 py-1.5 sm:py-2 bg-transparent border border-white text-white rounded-lg text-center text-size4"
       />
     </div>
   </div>

@@ -38,7 +38,7 @@ export const LanguageSelector: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-white bg-white dark:bg-darkPrimary border border-gray-300 dark:border-none rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        className="flex items-center gap-2 px-3 py-2 text-size4 font-medium text-gray-700 dark:text-white bg-white dark:bg-darkPrimary border border-gray-300 dark:border-none rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         aria-label="Select language"
       >
         <svg
@@ -57,8 +57,9 @@ export const LanguageSelector: React.FC = () => {
         <span className="hidden sm:inline">{currentLanguage.nativeName}</span>
         <span className="sm:hidden">{currentLanguage.code.toUpperCase()}</span>
         <svg
-          className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""
-            }`}
+          className={`w-4 h-4 transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -79,10 +80,11 @@ export const LanguageSelector: React.FC = () => {
               <button
                 key={language.code}
                 onClick={() => handleLanguageChange(language)}
-                className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between ${currentLanguage.code === language.code
+                className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between ${
+                  currentLanguage.code === language.code
                     ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
                     : "text-gray-700 dark:text-gray-200"
-                  }`}
+                }`}
               >
                 <div className="flex flex-col">
                   <span className="font-medium">{language.nativeName}</span>

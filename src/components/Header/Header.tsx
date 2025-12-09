@@ -8,6 +8,7 @@ import { LanguageSelector } from "../LanguageSelector";
 import { useTranslation } from "@/hooks/useTranslation";
 import { X } from "lucide-react";
 import { useDeviceType } from "@/hooks/useDeviceDetect";
+import speedCheckLogo from "@/assets/speed-checklogo.png";
 
 // App store badge SVGs / PNGs (you can replace with your actual assets)
 import AppStoreBadge from "@/assets/applestor.png";
@@ -58,7 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
   isTestRunning = false,
   onAboutClick,
   extraCss,
-  upLiftStore
+  upLiftStore,
 }) => {
   const { deviceType } = useDeviceType();
   const router = useRouter();
@@ -143,10 +144,11 @@ export const Header: React.FC<HeaderProps> = ({
             <Fragment>
               {/* Dark Overlay */}
               <div
-                className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${isMobileMenuOpen
-                  ? "opacity-100"
-                  : "opacity-0 pointer-events-none"
-                  }`}
+                className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
+                  isMobileMenuOpen
+                    ? "opacity-100"
+                    : "opacity-0 pointer-events-none"
+                }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               />
 
@@ -156,10 +158,11 @@ export const Header: React.FC<HeaderProps> = ({
                 fixed top-0 right-0 md:bottom-0 w-full md:w-[30%] bg-darkPrimary text-white z-50
                 flex flex-col
                 transition-transform duration-300 ease-out
-                ${isMobileMenuOpen
+                ${
+                  isMobileMenuOpen
                     ? "max-md:translate-y-0 md:translate-x-0"
                     : "max-md:-translate-y-full md:translate-x-full"
-                  }
+                }
               `}
               >
                 {/* Header: Language + Close */}
@@ -184,7 +187,7 @@ export const Header: React.FC<HeaderProps> = ({
                         onAboutClick?.();
                         setIsMobileMenuOpen(false);
                       }}
-                      className="hover:text-gray-400 transition"
+                      className="hover:text-gray-400 transition text-size2 text-white/80"
                     >
                       {t("About")}
                     </button>
@@ -193,14 +196,14 @@ export const Header: React.FC<HeaderProps> = ({
 
                     <span
                       onClick={handleHistoryNavigate}
-                      className="hover:text-gray-400 transition"
+                      className="hover:text-gray-400 transition text-size2 text-white/80"
                     >
                       {t("Test History")}
                     </span>
 
                     <div className="w-32 border-t border-white/20" />
 
-                    <button className="hover:text-gray-400 transition">
+                    <button className="hover:text-gray-400 transition text-size2 text-white/80">
                       {t("FAQs")}
                     </button>
                   </div>
@@ -208,7 +211,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {/* TRAI MySpeed App Section */}
                   <div className="border border-gray-600 rounded-lg p-4 m-6 mb-10 md:mb-auto mt-10 md:mt-auto">
                     <div className="flex justify-between gap-4 items-center">
-                      <span className="text-lg max-sm:text-md items-center font-semibold mb-2">
+                      <span className="items-center font-semibold text-[18px] max-sm:text-[16px] mb-2 text-white/80">
                         {t("Download")}{" "}
                         <span className="text-darkYellow">
                           {t("TRAI MySpeed App")}
@@ -224,29 +227,29 @@ export const Header: React.FC<HeaderProps> = ({
                             <Image
                               src={AppStoreBadge}
                               alt="App Store"
-                              className="w-22"
+                              className="w-[7rem]"
                             />
                           </a>
                         )}
 
                         {(deviceType === "android" ||
                           deviceType === "other") && (
-                            <a
-                              href="https://play.google.com/store/apps/details?id=com.rma.myspeed&hl=en"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <Image
-                                src={GooglePlayBadge}
-                                alt="Google Play"
-                                className="w-22"
-                              />
-                            </a>
-                          )}
+                          <a
+                            href="https://play.google.com/store/apps/details?id=com.rma.myspeed&hl=en"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Image
+                              src={GooglePlayBadge}
+                              alt="Google Play"
+                              className="w-[7rem]"
+                            />
+                          </a>
+                        )}
                       </div>
                     </div>
 
-                    <p className="text-[0.8rem] text-white text-center mt-4">
+                    <p className="text-size4 text-white/80 text-center mt-4">
                       {t(
                         "Make the most of your internet and network coverage."
                       )}
@@ -254,13 +257,13 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
 
                   {/* Footer */}
-                  <div className="p-6 text-center text-[0.8rem] text-white">
+                  <div className="p-6 text-center text-[10px] text-white">
                     <div className="flex gap-4 justify-center items-center">
                       <a
                         href="https://trai.gov.in/terms-conditions"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-white hover:text-white/80 transition"
+                        className="text-white/80 hover:text-white transition"
                       >
                         Terms & Conditions
                       </a>
@@ -268,7 +271,7 @@ export const Header: React.FC<HeaderProps> = ({
                         href="https://www.trai.gov.in/portals-apps/privacy-policy"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-white hover:text-white/80 transition"
+                        className="text-white/80 hover:text-white transition"
                       >
                         Privacy Policy
                       </a>
@@ -294,7 +297,11 @@ export const Header: React.FC<HeaderProps> = ({
   );
 };
 
-const AppDownloadPopup = ({ upLiftStore }: { upLiftStore: (showAppStrip: boolean) => void }) => {
+const AppDownloadPopup = ({
+  upLiftStore,
+}: {
+  upLiftStore?: (showAppStrip: boolean) => void;
+}) => {
   const t = useTranslation();
 
   const [showAppStrip, setShowAppStrip] = useState(false);
@@ -319,11 +326,11 @@ const AppDownloadPopup = ({ upLiftStore }: { upLiftStore: (showAppStrip: boolean
     deviceType === "android" || deviceType === "other"
       ? "https://play.google.com/store/apps/details?id=com.rma.myspeed&hl=en"
       : deviceType === "ios" || deviceType === "other"
-        ? "https://apps.apple.com/in/app/trai-myspeed/id1129080754"
-        : null;
+      ? "https://apps.apple.com/in/app/trai-myspeed/id1129080754"
+      : null;
 
   useEffect(() => {
-    upLiftStore(showAppStrip)
+    upLiftStore?.(showAppStrip);
   }, [showAppStrip]);
 
   if (!showAppStrip) {
@@ -332,15 +339,21 @@ const AppDownloadPopup = ({ upLiftStore }: { upLiftStore: (showAppStrip: boolean
 
   return (
     <div
-      className={`relative top-0 left-0 right-0 z-[9999] transition-all duration-500 ease-in-out ${showAppStrip
-        ? "translate-y-0 opacity-100"
-        : "-translate-y-full opacity-0"
-        }`}
+      className={`relative top-0 left-0 right-0 z-99 transition-all duration-500 ease-in-out ${
+        showAppStrip
+          ? "translate-y-0 opacity-100"
+          : "-translate-y-full opacity-0"
+      }`}
     >
-      <div className="bg-darkSecondary text-white py-3 px-4 flex items-center justify-between gap-3 shadow-lg sm:hidden">
+      <div className="bg-darkSecondary text-white py-3 px-4 flex items-center justify-between gap-3 shadow-lg lg:hidden">
         {/* Badges Container */}
         <div className="flex gap-2">
-          <Image src={traiLogo} alt="TRAI" className="h-8 w-auto" priority />
+          <Image
+            src={speedCheckLogo}
+            alt="TRAI"
+            className="h-full w-[5rem] filter brightness-0 invert mt-3"
+            priority
+          />
           <div className="flex flex-col">
             <p className="text-sm font-semibold line-clamp-1 m-0 p-0">
               {t("Download MySpeed for Faster, Smarter Testing")}
@@ -357,6 +370,7 @@ const AppDownloadPopup = ({ upLiftStore }: { upLiftStore: (showAppStrip: boolean
             <Link
               href={openUrl}
               className="block border py-1 px-3 rounded-full"
+              target="_blank"
             >
               Open
             </Link>

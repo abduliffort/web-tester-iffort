@@ -24,6 +24,8 @@ import RenderCompletedResults from "./RenderCompletedResults";
 import Image from "next/image";
 import speedCheckLogo from "@/assets/speed-checklogo.png";
 import Tooltip from "@mui/material/Tooltip";
+import { StopTestConfirmation } from "./StopTestConfirmation";
+import IpDetails from "@/page-components/IpDetails";
 
 interface SystemInfo {
   userIP?: string;
@@ -112,6 +114,7 @@ export const TestModal: React.FC<TestModalProps> = ({
   } | null>(null);
   const [userIP, setUserIP] = useState<string>("Fetching...");
   const [showBlockerPopup, setShowBlockerPopup] = useState(false);
+  const [showStopConfirmation, setShowStopConfirmation] = useState(false);
 
   // Use refs for duplicate prevention (more reliable than state for sync checks)
   const isTestRunningRef = useRef<boolean>(false); // Changed from state to ref
@@ -591,13 +594,32 @@ export const TestModal: React.FC<TestModalProps> = ({
               ? "web"
               : (step as keyof typeof progressByTest);
             if (testKey in progressByTest) {
-              setProgressByTest((prev) => ({
-                ...prev,
-                [testKey]: Math.max(
-                  prev[testKey as keyof typeof progressByTest],
-                  progress
-                ),
-              }));
+              setProgressByTest((prev) => {
+                // Handle multiple web tests cumulatively
+                if (testKey === "web" && step.startsWith("web")) {
+                  // total expected web tests (you can tweak if dynamic)
+                  const totalWebTests = 3; // or infer dynamically later
+                  const completedWebs = Object.keys(prev).filter(
+                    (k) =>
+                      k.startsWith("web") &&
+                      prev[k as keyof typeof prev] === 100
+                  ).length;
+
+                  const cumulativeProgress =
+                    ((completedWebs + progress / 100) / totalWebTests) * 100;
+
+                  return { ...prev, web: cumulativeProgress };
+                }
+
+                // normal case for other tests
+                return {
+                  ...prev,
+                  [testKey]: Math.max(
+                    prev[testKey as keyof typeof progressByTest],
+                    progress
+                  ),
+                };
+              });
             }
 
             // Keep legacy stepProgress for backward compatibility
@@ -774,13 +796,14 @@ export const TestModal: React.FC<TestModalProps> = ({
     }
   }, [testEngine]);
 
-  const handleStopTestWithConfirmation = useCallback(() => {
-    // Block stopping test - show popup instead
+  const handleStopTestWithConfirmation = () => {
     if (isTestRunningRef.current) {
-      setShowBlockerPopup(true);
+      setShowStopConfirmation(true);
       return;
     }
+  };
 
+  const onConfirmStop = useCallback(() => {
     // Clear Master ID cache when cancelling continuous test
     if (
       testEngine &&
@@ -796,6 +819,12 @@ export const TestModal: React.FC<TestModalProps> = ({
       testWasCancelledRef.current = true; // Mark as cancelled
       onCancelTest();
     }
+
+    if (onTestRunningChange) {
+      onTestRunningChange(false);
+    }
+
+    setShowStopConfirmation(false);
   }, [handleStopTest, onCancelTest, testEngine, selectedScenarioId]);
 
   const handleReset = useCallback(
@@ -1099,7 +1128,7 @@ export const TestModal: React.FC<TestModalProps> = ({
       // Show speed with one decimal place
       formattedValue = liveValue > 0 ? liveValue.toFixed(1) : "-";
     } else if (key === "web" || key === "streaming") {
-      unit = "Second";
+      unit = "Seconds";
       // Show delay with no decimal places
       formattedValue = liveValue > 0 ? liveValue.toFixed(0) : "-";
     }
@@ -1211,7 +1240,7 @@ export const TestModal: React.FC<TestModalProps> = ({
             activeActionsList.push({
               label: t("Web Page Load Time"),
               value: liveResults.web ? liveResults.web.toFixed(3) : "0.000",
-              unit: "Second",
+              unit: "Seconds",
               status:
                 currentStep === "web" || currentStep?.startsWith("web")
                   ? "in-progress"
@@ -1232,7 +1261,7 @@ export const TestModal: React.FC<TestModalProps> = ({
               value: liveResults.streaming
                 ? liveResults.streaming.toFixed(3)
                 : "0.000",
-              unit: "Second",
+              unit: "Seconds",
               status:
                 currentStep === "streaming"
                   ? "in-progress"
@@ -1297,329 +1326,344 @@ export const TestModal: React.FC<TestModalProps> = ({
     setCurrentScenarioId?.(undefined);
   };
   return (
-    <div className="w-full">
+    <>
       <div className="w-full">
-        <div className="">
-          {/* Close button */}
+        <div className="w-full">
+          <div className="">
+            {/* Close button */}
 
-          {/* Modal content */}
-          <div className="flex flex-col items-center w-full max-sm:mb-[3rem] mb-[3rem]">
-            {/* Header with Loader */}
-            <div className="flex flex-col w-full text-center relative">
-              {/* Close button aligned right */}
-              <div className="hidden lg:block">
-                {!results && isRunning && (
-                  <button
-                    onClick={
-                      results && !isRunning
-                        ? onExportResults
-                        : handleStopTestWithConfirmation
-                    }
-                    className="absolute w-[12rem] justify-center text-[0.9rem] gap-2 px-6 font-semibold flex border border-darkYellow right-2 top-2 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
-                    aria-label={
-                      results && !isRunning ? "Export Result" : "Stop Test"
-                    }
-                  >
-                    {results && !isRunning
-                      ? t("Export Result")
-                      : t("Stop Test")}
-                    {results && !isRunning ? (
-                      <Download color="white" size={20} />
-                    ) : (
-                      <X color="white" size={20} />
-                    )}
-                  </button>
-                )}
-                {results && (
-                  <>
-                    {onTestAgain && (!masterId || isLastTest) && (
+            {/* Modal content */}
+            <div className="flex flex-col items-center w-full max-sm:mb-[3rem] mb-[3rem]">
+              {/* Header with Loader */}
+              <div className="flex flex-col w-full text-center relative">
+                {/* Close button aligned right */}
+                <div className="hidden lg:block">
+                  {!results && isRunning && (
+                    <button
+                      onClick={
+                        results && !isRunning
+                          ? onExportResults
+                          : handleStopTestWithConfirmation
+                      }
+                      className="absolute w-[12rem] justify-center text-size3 gap-2 px-6 flex border border-darkYellow right-2 top-2 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+                      aria-label={
+                        results && !isRunning ? "Export Result" : "Stop Test"
+                      }
+                    >
+                      {results && !isRunning
+                        ? t("Export Result")
+                        : t("Stop Test")}
+                      {results && !isRunning ? (
+                        <Download color="white" size={20} />
+                      ) : (
+                        <X color="white" size={20} />
+                      )}
+                    </button>
+                  )}
+                  {results && (
+                    <>
+                      {onTestAgain && (!masterId || isLastTest) && (
+                        <button
+                          onClick={() => {
+                            handleReset();
+                          }}
+                          className="absolute w-[12rem] justify-center text-size3 gap-2 px-6 flex border border-white right-2 top-2 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+                        >
+                          {t("Test Again")}
+
+                          <RotateCw size={20} />
+                        </button>
+                      )}
                       <button
                         onClick={() => {
-                          handleReset();
+                          handleSuggest();
                         }}
-                        className="absolute w-[12rem] justify-center text-[0.9rem] gap-2 px-6 font-semibold flex border border-white right-2 top-2 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+                        className="absolute w-[12rem] justify-center text-size3 gap-2 px-6 flex border border-darkYellow right-2 top-20 dark:hover:text-gray-300 transition-colors p-2 dark:hover:bg-gray-800 rounded-full"
                       >
-                        {t("Test Again")}
-
-                        <RotateCw size={20} />
+                        {currentDisplay === ENV_CONFIG.SCENARIOS.FULL_TEST_ID
+                          ? t("Run a Speed Test")
+                          : t("Run a Video & Browser Test")}
                       </button>
+                      <button
+                        onClick={gotoHomepage}
+                        className="absolute w-[12rem] justify-center text-size3 gap-2 px-6 flex border border-white right-2 top-40 dark:hover:text-gray-300 transition-colors p-2 dark:hover:bg-gray-800 rounded-full"
+                      >
+                        {t("Go to Home")}
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {/* Title + Info icon */}
+                <div className="flex justify-center mb-[2rem] max-sm:mt-[2.5rem] max-sm:mb-[1rem] block">
+                  <Image
+                    src={speedCheckLogo}
+                    alt="MySpeed"
+                    className="w-[160px]"
+                    priority
+                  />
+                </div>
+                <h2 className="text-size1 text-gray-900 dark:text-gray-100 flex items-center justify-center gap-2 max-sm:mb-[0.5rem] max-sm:mt-[1rem]">
+                  {isRunning && !isInitializing && "Running a"}{" "}
+                  {getTestTitle().split(":")[0]}
+                  <Tooltip
+                    title={t(
+                      currentDisplay === ENV_CONFIG.SCENARIOS.FULL_TEST_ID
+                        ? "The speed test checks your download speed, upload speed, latency, packet loss, and jitter. These numbers help you understand how fast and stable your internet connection is."
+                        : "Download speed tells you how fast you receive data (videos, websites, apps). Upload speed tells you how fast you send data (photos, emails, video calls). Both are important for smooth internet use."
                     )}
-                    <button
-                      onClick={() => {
-                        handleSuggest();
-                      }}
-                      className="absolute w-[12rem] justify-center text-[0.9rem] gap-2 px-6 font-semibold flex border border-darkYellow right-2 top-20 dark:hover:text-gray-300 transition-colors p-2 dark:hover:bg-gray-800 rounded-full"
-                    >
-                      {currentDisplay === ENV_CONFIG.SCENARIOS.FULL_TEST_ID
-                        ? t("Run a Speed Test")
-                        : t("Run a Video & Browser Test")}
-                    </button>
-                    <button
-                      onClick={gotoHomepage}
-                      className="absolute w-[12rem] justify-center text-[0.9rem] gap-2 px-6 font-semibold flex border border-white right-2 top-40 dark:hover:text-gray-300 transition-colors p-2 dark:hover:bg-gray-800 rounded-full"
-                    >
-                      {t("Go to Home")}
-                    </button>
+                    enterTouchDelay={0}
+                  >
+                    <Info size={18} />
+                  </Tooltip>
+                </h2>
+
+                {/* Status line */}
+                {isRunning || isInitializing || results ? (
+                  <div className="flex items-center justify-center gap-2 mt-2">
+                    {(isInitializing || isRunning) && (
+                      <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
+                    )}
+                    <span className={`text-size3 text-white/50`}>
+                      {isInitializing && t("Initializing")}
+                      {isRunning && !isInitializing && t("Test in-progress")}
+                      {results && !isRunning && !isInitializing && t("")}
+                    </span>
+                  </div>
+                ) : (
+                  <>
+                    <div className="h-[375px]">
+                      <div className="flex justify-center items-center">
+                        <div className="animate-spin rounded-full h-[360px] w-5 border-b-2 border-blue-600 dark:border-blue-400"></div>
+                      </div>
+                    </div>
                   </>
                 )}
               </div>
-
-              {/* Title + Info icon */}
-              <div className="flex justify-center mb-[2rem] max-sm:mt-[3rem] max-sm:mb-[1rem] block max-sm:hidden">
-                <Image
-                  src={speedCheckLogo}
-                  alt="MySpeed"
-                  className="w-[200px] max-sm:hidden"
-                  priority
-                />
-              </div>
-              <h2 className="text-[1.4rem] font-bold text-gray-900 dark:text-gray-100 flex items-center justify-center gap-2 max-sm:mb-[1rem] max-sm:mt-[3rem]">
-                {getTestTitle().split(":")[0]}
-
-                <Tooltip
-                  title={t(
-                    currentDisplay === ENV_CONFIG.SCENARIOS.FULL_TEST_ID
-                      ? "The speed test checks your download speed, upload speed, latency, packet loss, and jitter. These numbers help you understand how fast and stable your internet connection is."
-                      : "Download speed tells you how fast you receive data (videos, websites, apps). Upload speed tells you how fast you send data (photos, emails, video calls). Both are important for smooth internet use."
-                  )}
-                >
-                  <Info />
-                </Tooltip>
-              </h2>
-
-              {/* Status line */}
-              {isRunning || isInitializing || results ? (
-                <div className="flex items-center justify-center gap-2 mt-2">
-                  {(isInitializing || isRunning) && (
-                    <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
-                  )}
-                  <span
-                    className={`text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300`}
+              {/* Progress Section - 50:50 split */}
+              {(isRunning || isInitializing) && (
+                <div className="w-full">
+                  <div
+                    className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
+                      currentDisplay === ENV_CONFIG.SCENARIOS.FULL_TEST_ID
+                        ? `items-center gap-[5rem] ${
+                            !isInitializing && "mt-12"
+                          }`
+                        : ""
+                    }`}
                   >
-                    {isInitializing && t("Initializing")}
-                    {isRunning && !isInitializing && t("Test in-progress")}
-                    {results && !isRunning && !isInitializing && t("")}
-                  </span>
-                </div>
-              ) : (
-                <>
-                  <div className="h-[375px]">
-                    <div className="flex justify-center items-center">
-                      <div className="animate-spin rounded-full h-[360px] w-5 border-b-2 border-blue-600 dark:border-blue-400"></div>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-            {/* Progress Section - 50:50 split */}
-            {(isRunning || isInitializing) && (
-              <div className="w-full">
-                <div
-                  className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
-                    currentDisplay === ENV_CONFIG.SCENARIOS.FULL_TEST_ID
-                      ? `items-center gap-[5rem] ${!isInitializing && "mt-12"}`
-                      : ""
-                  }`}
-                >
-                  {/* Left: Live Speedometer for active test OR iframe for web/video - 50% */}
-                  <div className="w-full flex items-center justify-center">
-                    {/* Show Latency Speedometer */}
-                    {currentStep === "latency" && (
-                      <SpeedGauge
-                        currentSpeed={liveResults.latency || 0}
-                        maxSpeed={50}
-                        label={t("Latency & Jitter")}
-                        description={t("Network response time")}
-                      />
-                    )}
+                    {/* Left: Live Speedometer for active test OR iframe for web/video - 50% */}
+                    <div className="w-full flex items-center justify-center">
+                      {/* Show Latency Speedometer */}
+                      {currentStep === "latency" && (
+                        <SpeedGauge
+                          currentSpeed={liveResults.latency || 0}
+                          maxSpeed={50}
+                          label={t("Latency & Jitter")}
+                          description={t("Network response time")}
+                        />
+                      )}
 
-                    {/* Show Download Speedometer */}
-                    {currentStep === "download" && (
-                      <SpeedGauge
-                        currentSpeed={liveResults.download || 0}
-                        maxSpeed={400}
-                        label={t("Download Speed")}
-                        description={t("Data receiving rate")}
-                      />
-                    )}
+                      {/* Show Download Speedometer */}
+                      {currentStep === "download" && (
+                        <SpeedGauge
+                          currentSpeed={liveResults.download || 0}
+                          maxSpeed={400}
+                          label={t("Download Speed")}
+                          description={t("Data receiving rate")}
+                        />
+                      )}
 
-                    {/* Show Upload Speedometer */}
-                    {currentStep === "upload" && (
-                      <SpeedGauge
-                        currentSpeed={liveResults.upload || 0}
-                        maxSpeed={400}
-                        label={t("Upload Speed")}
-                        description={t("Data sending rate")}
-                      />
-                    )}
+                      {/* Show Upload Speedometer */}
+                      {currentStep === "upload" && (
+                        <SpeedGauge
+                          currentSpeed={liveResults.upload || 0}
+                          maxSpeed={400}
+                          label={t("Upload Speed")}
+                          description={t("Data sending rate")}
+                        />
+                      )}
 
-                    {/* Show Web Test iframe */}
-                    {(currentStep === "web" ||
-                      currentStep?.startsWith("web")) && (
-                      <div className="w-full bg-gray-50 bg-gray-800 rounded-lg overflow-hidden relative aspect-video min-h-[288px] mx-[2rem] max-sm:mx-4">
-                        <div
-                          id="web-test-container"
-                          className="w-full h-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center"
-                        >
-                          <div className="text-center text-gray-500 dark:text-gray-400">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-3"></div>
-                            <p className="text-sm font-medium">
-                              {t("Loading web page...")}
-                            </p>
+                      {/* Show Web Test iframe */}
+                      {(currentStep === "web" ||
+                        currentStep?.startsWith("web")) && (
+                        <div className="w-full bg-gray-50 bg-gray-800 rounded-lg overflow-hidden relative aspect-video min-h-[288px] mx-[2rem] max-sm:mx-4">
+                          <div
+                            id="web-test-container"
+                            className="w-full h-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center"
+                          >
+                            <div className="text-center text-gray-500 dark:text-gray-400">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-3"></div>
+                              <p className="text-sm font-medium">
+                                {t("Loading web page...")}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900/80 to-transparent p-4">
-                          <div className="text-white">
-                            <p className="text-sm font-semibold mb-2">
-                              Web Browsing Test
-                            </p>
-                            <div className="flex items-center gap-3">
-                              <div className="flex-1 h-2 bg-white/20 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-white rounded-full transition-all duration-300"
-                                  style={{ width: `${stepProgress}%` }}
-                                />
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900/80 to-transparent p-4">
+                            <div className="text-white">
+                              <p className="text-sm font-semibold mb-2">
+                                Web Browsing Test
+                              </p>
+                              <div className="flex items-center gap-3">
+                                <div className="flex-1 h-2 bg-white/20 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-white rounded-full transition-all duration-300"
+                                    style={{ width: `${stepProgress}%` }}
+                                  />
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {/* Show Streaming Test iframe */}
-                    {currentStep === "streaming" && (
-                      <div className="w-full bg-gray-900 bg-gray-950 rounded-lg overflow-hidden relative aspect-video min-h-[288px] mx-0 max-sm:mx-4">
-                        <div
-                          id="streaming-test-container"
-                          className="w-full h-full bg-gray-900 dark:bg-gray-950 flex items-center justify-center"
-                        >
-                          <div className="text-center text-white">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-3"></div>
-                            <p className="text-sm font-medium">
-                              Loading video stream...
-                            </p>
+                      {/* Show Streaming Test iframe */}
+                      {currentStep === "streaming" && (
+                        <div className="w-full bg-gray-900 bg-gray-950 rounded-lg overflow-hidden relative aspect-video min-h-[288px] mx-0 max-sm:mx-4">
+                          <div
+                            id="streaming-test-container"
+                            className="w-full h-full bg-gray-900 dark:bg-gray-950 flex items-center justify-center"
+                          >
+                            <div className="text-center text-white">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-3"></div>
+                              <p className="text-sm font-medium">
+                                Loading video stream...
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {/* Initializing placeholder */}
-                    {isInitializing && (
-                      <div className="flex justify-center items-center h-[360px]"></div>
-                    )}
-                  </div>
+                      {/* Initializing placeholder */}
+                      {isInitializing && (
+                        <div className="flex justify-center items-center h-[360px]"></div>
+                      )}
+                    </div>
 
-                  {/* Right: Test Progress Cards - 50% */}
-                  <div className="w-full flex flex-col-reverse">
-                    {/* Test Progress List */}
-                    {isRunning && (
-                      <div className="progress-section mx-3">
-                        <TestProgressList
-                          tests={progressListTests} // <--- MUST use the filtered list here
-                          currentStep={currentStep}
-                        />
-                      </div>
-                    )}
+                    {/* Right: Test Progress Cards - 50% */}
+                    <div className="w-full flex flex-col-reverse">
+                      {/* Test Progress List */}
+                      {isRunning && (
+                        <div className="progress-section mx-3">
+                          <TestProgressList
+                            tests={progressListTests} // <--- MUST use the filtered list here
+                            currentStep={currentStep}
+                          />
+                        </div>
+                      )}
 
-                    {estimatedTime && (
-                      <div className="mt-3 sm:mt-4 text-center">
-                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-                          Estimated Time Left in Test:{" "}
-                          <strong className="font-semibold text-gray-900 dark:text-gray-100">
-                            ~ {estimatedTime}
-                          </strong>
-                        </p>
-                      </div>
-                    )}
+                      {estimatedTime && (
+                        <div className="mt-3 sm:mt-4 text-center">
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+                            Estimated Time Left in Test:{" "}
+                            <strong className="font-semibold text-gray-900 dark:text-gray-100">
+                              ~ {estimatedTime}
+                            </strong>
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            {/* Error Display */}
-            {error && (
-              <div className="w-full px-2 sm:px-4">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 text-center">
-                  <p className="text-red-700 text-xs sm:text-sm">{error}</p>
+              )}
+              {/* Error Display */}
+              {error && (
+                <div className="w-full px-2 sm:px-4">
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 text-center">
+                    <p className="text-red-700 text-xs sm:text-sm">{error}</p>
+                  </div>
                 </div>
-              </div>
-            )}
-            {/* Completed results */}
-            <RenderCompletedResults
-              testResults={results}
-              selectedScenarioId={displayScenarioId}
-              displayTestId={displayTestId}
-              masterId={masterId}
-              dateTime={dateTime}
-              locationInfo={locationInfo}
-              userIP={userIP}
-            />
-            {/* Action buttons */}
+              )}
+              {/* Completed results */}
+              <RenderCompletedResults
+                testResults={results}
+                selectedScenarioId={displayScenarioId}
+                displayTestId={displayTestId}
+                masterId={masterId}
+                dateTime={dateTime}
+                locationInfo={locationInfo}
+                userIP={userIP}
+              />
+              {/* Action buttons */}
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="block lg:hidden flex flex-col gap-4 mb-[2rem] mx-3">
-        {/* Top two buttons in a row */}
-        <div className="flex justify-between gap-2">
-          {!results && isRunning && (
+        <div className="block lg:hidden flex flex-col gap-4 mb-[2rem] mx-3">
+          {/* Top two buttons in a row */}
+          <IpDetails className={"!mb-[3rem]"} />
+          <div className="flex justify-between gap-2">
+            {!results && isRunning && (
+              <button
+                onClick={
+                  results && !isRunning
+                    ? onExportResults
+                    : handleStopTestWithConfirmation
+                }
+                className="flex-1 justify-center text-[0.9rem] gap-2 px-4 font-semibold flex border border-darkYellow hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+                aria-label={
+                  results && !isRunning ? "Export Result" : "Stop Test"
+                }
+              >
+                {results && !isRunning ? t("Export Result") : t("Stop Test")}
+                {results && !isRunning ? (
+                  <Download color="white" size={20} />
+                ) : (
+                  <X color="white" size={20} />
+                )}
+              </button>
+            )}
+
+            {results && onTestAgain && (!masterId || isLastTest) && (
+              <>
+                <button
+                  onClick={() => {
+                    handleReset();
+                  }}
+                  className="justify-center w-full text-[0.9rem] gap-2 px-4 font-semibold flex border border-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+                >
+                  {t("Test Again")}
+                  <RotateCw size={20} />
+                </button>
+                <button
+                  onClick={gotoHomepage}
+                  className="justify-center w-full text-[0.9rem] gap-2 px-4 font-semibold flex border border-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+                >
+                  {t("Go to Home")}
+                  <RotateCw size={20} />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Third button full width */}
+          {results && (
             <button
-              onClick={
-                results && !isRunning
-                  ? onExportResults
-                  : handleStopTestWithConfirmation
-              }
-              className="flex-1 justify-center text-[0.9rem] gap-2 px-4 font-semibold flex border border-darkYellow hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
-              aria-label={results && !isRunning ? "Export Result" : "Stop Test"}
+              onClick={handleSuggest}
+              className="justify-center w-full text-[0.9rem] gap-2 px-4 font-semibold flex border border-darkYellow dark:hover:text-gray-300 transition-colors p-2 dark:hover:bg-gray-800 rounded-full"
             >
-              {results && !isRunning ? t("Export Result") : t("Stop Test")}
-              {results && !isRunning ? (
-                <Download color="white" size={20} />
-              ) : (
-                <X color="white" size={20} />
-              )}
+              {currentDisplay === ENV_CONFIG.SCENARIOS.FULL_TEST_ID
+                ? t("Run a Speed Test")
+                : t("Run a Video & Browser Test")}
             </button>
-          )}
-
-          {results && onTestAgain && (!masterId || isLastTest) && (
-            <>
-              <button
-                onClick={() => {
-                  handleReset();
-                }}
-                className="justify-center w-full text-[0.9rem] gap-2 px-4 font-semibold flex border border-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
-              >
-                {t("Test Again")}
-                <RotateCw size={20} />
-              </button>
-              <button
-                onClick={gotoHomepage}
-                className="justify-center w-full text-[0.9rem] gap-2 px-4 font-semibold flex border border-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
-              >
-                {t("Go to Home")}
-                <RotateCw size={20} />
-              </button>
-            </>
           )}
         </div>
 
-        {/* Third button full width */}
-        {results && (
-          <button
-            onClick={handleSuggest}
-            className="justify-center w-full text-[0.9rem] gap-2 px-4 font-semibold flex border border-darkYellow dark:hover:text-gray-300 transition-colors p-2 dark:hover:bg-gray-800 rounded-full"
-          >
-            {currentDisplay === ENV_CONFIG.SCENARIOS.FULL_TEST_ID
-              ? t("Run a Speed Test")
-              : t("Run a Video & Browser Test")}
-          </button>
-        )}
+        {/* Stop confirmation popup */}
+        <StopTestConfirmation
+          isOpen={showStopConfirmation}
+          onConfirm={onConfirmStop}
+          onCancel={() => setShowStopConfirmation(false)}
+        />
+
+        {/* Test Blocker Popup */}
+        <TestBlockerPopup
+          isOpen={showBlockerPopup}
+          onClose={() => setShowBlockerPopup(false)}
+        />
       </div>
 
-      {/* Test Blocker Popup */}
-      <TestBlockerPopup
-        isOpen={showBlockerPopup}
-        onClose={() => setShowBlockerPopup(false)}
-      />
-    </div>
+      <IpDetails className="max-sm:!hidden" />
+    </>
   );
 };

@@ -188,8 +188,8 @@ export class StreamingTester {
           (video as any)._hlsInstance = null;
         }
 
-        if (streamingContainer.contains(video)) {
-          streamingContainer.removeChild(video);
+        if (streamingContainer?.contains(video)) {
+          streamingContainer?.removeChild(video);
         }
         // Reset container
         streamingContainer.innerHTML = `
@@ -263,7 +263,7 @@ export class StreamingTester {
         const bytes_sec =
           totalBytesTransferred > 0 && totalDuration > 0
             ? totalBytesTransferred /
-              (totalDuration / API_CONFIG.CONVERSIONS.MS_TO_SECONDS)
+            (totalDuration / API_CONFIG.CONVERSIONS.MS_TO_SECONDS)
             : 0;
 
         resolve({
@@ -417,7 +417,7 @@ export class StreamingTester {
         const bytes_sec =
           totalBytesTransferred > 0 && totalDuration > 0
             ? totalBytesTransferred /
-              (totalDuration / API_CONFIG.CONVERSIONS.MS_TO_SECONDS)
+            (totalDuration / API_CONFIG.CONVERSIONS.MS_TO_SECONDS)
             : 0;
 
         resolve({
@@ -464,9 +464,9 @@ export class StreamingTester {
           video.duration > 0
             ? `${currentTime}/${totalTime}s`
             : `${Math.round(
-                (performance.now() - testStartTime) /
-                  API_CONFIG.CONVERSIONS.MS_TO_SECONDS
-              )}s`;
+              (performance.now() - testStartTime) /
+              API_CONFIG.CONVERSIONS.MS_TO_SECONDS
+            )}s`;
         const stats = `Time: ${timeDisplay}`;
         this.updateStreamingUI(streamingContainer, stats, progress);
       }, TEST_CONFIG.STREAMING.PROGRESS_UPDATE_INTERVAL_MS); // Check frequency for lag detection
@@ -742,12 +742,13 @@ export class StreamingTester {
       setTimeout(resolve, TEST_CONFIG.STREAMING.UI_UPDATE_DELAY_MS)
     );
 
-    const container = document.getElementById("streaming-test-container");
+    const container = document?.getElementById("streaming-test-container");
     if (!container) {
       // console.error(
       //   "Available containers:",
       //   document.querySelectorAll('[id*="container"]')
       // );
+
       throw new Error(
         'Streaming container not found. Make sure currentStep is "streaming" and UI component is rendered.'
       );
@@ -763,7 +764,7 @@ export class StreamingTester {
     progress: number | null
   ) {
     // Update the streaming UI with current status
-    const existingVideo = container.querySelector("video");
+    const existingVideo = container?.querySelector("video");
     if (existingVideo) {
       // Video exists - add or update overlay
       let overlay = container.querySelector(
@@ -806,17 +807,16 @@ export class StreamingTester {
           <div style="font-size: 24px; margin-bottom: 12px;">📺</div>
           <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Streaming Test</div>
           <div style="font-size: 14px; margin-bottom: 12px;">${message}</div>
-          ${
-            progress !== null
-              ? `
+          ${progress !== null
+          ? `
             <div style="width: 200px; height: 4px; background: #e5e7eb; border-radius: 2px; overflow: hidden;">
               <div style="height: 100%; background: #8B5CF6; width: ${progress}%; transition: width 0.3s;"></div>
             </div>
           `
-              : `
+          : `
             <div style="width: 20px; height: 20px; border: 2px solid #8B5CF6; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite;"></div>
           `
-          }
+        }
           <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
         </div>
       `;

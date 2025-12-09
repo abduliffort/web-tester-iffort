@@ -109,7 +109,7 @@ const RenderCompletedResults = ({
   };
 
   // Circle items for final results
-  const iconClass = "clamp(16px, 3vw, 24px)"; // 16px on small, up to 24px max
+  const iconClass = "clamp(16px, 3vw, 20px)"; // 16px on small, up to 24px max
   const resultCircles = [
     // Include Latency, Download, Upload only if it is NOT the Full Test
     ...(!isFullTest
@@ -118,19 +118,19 @@ const RenderCompletedResults = ({
             label: t("Latency"),
             value: latency.toFixed(0),
             unit: "ms",
-            icon: <ArrowLeftRight size={iconClass} />,
+            icon: <ArrowLeftRight size={iconClass} className="text-white/70" />,
           },
           {
             label: t("Download"),
             value: downloadSpeed.toFixed(1),
             unit: "Mbps",
-            icon: <Download size={iconClass} />,
+            icon: <Download size={iconClass} className="text-white/70" />,
           },
           {
             label: t("Upload"),
             value: uploadSpeed.toFixed(1),
             unit: "Mbps",
-            icon: <Upload size={iconClass} />,
+            icon: <Upload size={iconClass} className="text-white/70" />,
           },
         ]
       : []),
@@ -142,13 +142,13 @@ const RenderCompletedResults = ({
             label: t("Web Browsing Delay"),
             value: webDelay.toFixed(3),
             unit: "ms",
-            icon: <Globe size={iconClass} />,
+            icon: <Globe size={iconClass} className="text-white/70" />,
           },
           {
             label: t("Video Streaming Delay"),
             value: streamingDelay.toFixed(3),
             unit: "ms",
-            icon: <Video size={iconClass} />,
+            icon: <Video size={iconClass} className="text-white/70" />,
           },
         ]
       : []),
@@ -158,17 +158,17 @@ const RenderCompletedResults = ({
     <div className="w-full max-w-5xl mx-auto">
       {/* Header */}
       <div className="flex flex-row flex-wrap justify-center items-center gap-2 sm:gap-8 text-xs sm:text-sm mb-[5rem] uppercase tracking-wider">
-        <span className="text-white/50 font-medium mr-2 sm:mr-0">
+        <span className="text-white/50 text-size4 mr-2 sm:mr-0">
           {t("DATE")}:{" "}
-          <span className="text-white font-bold">
+          <span className="text-white text-size4">
             {formatDateTime(dateTime)}
           </span>
         </span>
         <div className="flex items-center gap-2 sm:gap-3">
-          <span className="text-white/50 font-medium">
+          <span className="text-white/50 text-size4">
             {t("Test ID")}:{" "}
             <span
-              className={`font-bold ${
+              className={`text-size4 ${
                 isCopied ? "text-green-500" : "text-white"
               }`}
             >
@@ -186,7 +186,7 @@ const RenderCompletedResults = ({
             title={t("Copy Test ID")}
           >
             <Copy
-              size={16}
+              size={14}
               className={isCopied ? "text-green-500" : "text-white"}
             />
           </button>
@@ -194,7 +194,7 @@ const RenderCompletedResults = ({
       </div>
 
       {/* Main Gradient Circle Results */}
-      <div className="flex justify-center gap-2 sm:gap-8 overflow-x-auto pb-4">
+      <div className="flex justify-center gap-2 sm:gap-8 overflow-x-auto pb-4 max-sm:mx-3">
         {resultCircles.map((item, index) => (
           <div
             key={index}
@@ -206,8 +206,8 @@ const RenderCompletedResults = ({
             {/* Gradient Circle */}
             <div
               className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-full flex flex-col items-center justify-center 
-       bg-gradient-to-b from-[#F3B643] from-20% to-[#F9DA95] to-80%
-       shadow-2xl"
+              bg-gradient-to-b from-[#F3B643] from-20% to-[#F9DA95] to-80%
+              shadow-2xl"
             >
               {(() => {
                 // Convert ms → s for Web and Video
@@ -221,7 +221,7 @@ const RenderCompletedResults = ({
                     item.label.includes("Video")
                   ) {
                     displayValue = (numericValue / 1000).toFixed(2); // ✅ two decimals
-                    displayUnit = "Second";
+                    displayUnit = "Seconds";
                   }
                 } else {
                   displayValue = "-";
@@ -229,10 +229,10 @@ const RenderCompletedResults = ({
 
                 return (
                   <>
-                    <span className="text-sm sm:text-lg font-semibold tracking-tight select-none dark:text-black">
+                    <span className="text-size1 tracking-tight select-none dark:text-darkBlack">
                       {displayValue}
                     </span>
-                    <span className="text-[0.6rem] sm:text-xs mt-1 text-black font-medium">
+                    <span className="text-size4 text-darkBlack mt-1">
                       {displayUnit}
                     </span>
                   </>
@@ -241,10 +241,13 @@ const RenderCompletedResults = ({
             </div>
 
             {/* Label with Icon */}
-            <div className="mt-2 sm:mt-3 flex items-center gap-1 sm:gap-3 text-[0.7rem] sm:text-[1.12rem]">
-              {item.icon}
-              {item.label}
-            </div>
+            <span className="flex mt-2 sm:mt-3 gap-1 sm:gap-2">
+              <span>{item.icon}</span>
+
+              <div className="text-size2 flex items-center  justify-center">
+                {item.label}
+              </div>
+            </span>
           </div>
         ))}
       </div>
@@ -253,18 +256,12 @@ const RenderCompletedResults = ({
       {!isFullTest && (
         <div className="flex flex-wrap justify-center gap-2 sm:gap-6 text-xs sm:text-sm">
           <span className="rounded-lg bg-white/10 p-2 px-3 sm:px-4">
-            <span className="text-white font-medium">
-              {t("Packet Loss: ")}{" "}
-            </span>{" "}
-            <span className="text-gray-900 dark:text-white">
-              {packetLoss.toFixed(1)}%
-            </span>
+            <span className="text-white text-size2">{t("Packet Loss: ")} </span>{" "}
+            <span className="text-size2">{packetLoss.toFixed(1)}%</span>
           </span>
           <span className="rounded-lg bg-white/10 p-2 px-3 sm:px-10">
-            <span className="text-white font-medium"> {t("Jitter: ")}</span>{" "}
-            <span className="text-gray-900 dark:text-white">
-              {jitter.toFixed(0)} ms
-            </span>
+            <span className="text-white text-size2"> {t("Jitter: ")}</span>{" "}
+            <span className="text-size2">{jitter.toFixed(0)} ms</span>
           </span>
         </div>
       )}
