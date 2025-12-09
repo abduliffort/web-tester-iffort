@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 /**
@@ -10,43 +10,69 @@ import { useLanguage } from "@/contexts/LanguageContext";
  */
 export function useTranslation() {
   const { currentLanguage, translate, translationCache } = useLanguage();
-  const [translations, setTranslations] = useState<Map<string, string>>(
-    new Map()
+  const translationsRef = useRef<Map<string, string>>(new Map());
+  const [, forceUpdate] = useState({});
+
+  // Track last language to clear cache synchronously during render
+  const lastLanguageCode = useRef(currentLanguage.code);
+  if (lastLanguageCode.current !== currentLanguage.code) {
+    translationsRef.current = new Map();
+    lastLanguageCode.current = currentLanguage.code;
+  }
+
+  const isMountedRef = useRef(false);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    // Trigger update on mount to catch any translations that resolved before mount
+    forceUpdate({});
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const t = useCallback(
+    (text: string): string => {
+      // If English, return as is
+      if (currentLanguage.code === "en") {
+        return text;
+      }
+
+      // Check local component cache first
+      const cached = translationsRef.current.get(text);
+      if (cached) {
+        return cached;
+      }
+
+      // Check global cache
+      const cacheKey = `${currentLanguage.code}:${text}`;
+      const globalCached = translationCache.get(cacheKey);
+      if (globalCached) {
+        // Update ref but don't force re-render for global hits
+        translationsRef.current.set(text, globalCached);
+        return globalCached;
+      }
+
+      // Trigger translation in background
+      translate(text).then((translated) => {
+        // Only update and re-render if this is a new translation
+        if (translationsRef.current.get(text) !== translated) {
+          translationsRef.current.set(text, translated);
+
+          // Safely trigger re-render only if component is still mounted
+          if (isMountedRef.current) {
+            forceUpdate({});
+          }
+        }
+      });
+
+      // Return original text while translating
+      return text;
+    },
+    [currentLanguage.code, translationCache, translate]
   );
 
-  const t = (text: string): string => {
-    // If English, return as is
-    if (currentLanguage.code === "en") {
-      return text;
-    }
-
-    // Check local component cache first
-    const cached = translations.get(text);
-    if (cached) {
-      return cached;
-    }
-
-    // Check global cache
-    const cacheKey = `${currentLanguage.code}:${text}`;
-    const globalCached = translationCache.get(cacheKey);
-    if (globalCached) {
-      setTranslations((prev) => new Map(prev).set(text, globalCached));
-      return globalCached;
-    }
-
-    // Trigger translation in background
-    translate(text).then((translated) => {
-      setTranslations((prev) => new Map(prev).set(text, translated));
-    });
-
-    // Return original text while translating
-    return text;
-  };
-
-  // Clear local cache when language changes
-  useEffect(() => {
-    setTranslations(new Map());
-  }, [currentLanguage]);
+  // No need for useEffect to clear cache anymore as it's done during render
 
   return t;
 }

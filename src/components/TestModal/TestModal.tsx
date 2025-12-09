@@ -35,6 +35,27 @@ interface SystemInfo {
   bestServer?: Server;
 }
 
+const TIMEOUT_MS = 15000; // 15 seconds timeout for initialization steps
+
+const withTimeout = <T,>(
+  promise: Promise<T>,
+  ms: number,
+  errorMsg: string
+): Promise<T> => {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(errorMsg)), ms);
+    promise
+      .then((res) => {
+        clearTimeout(timer);
+        resolve(res);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+};
+
 export const TestModal: React.FC<TestModalProps> = ({
   isOpen,
   onClose,
@@ -130,11 +151,11 @@ export const TestModal: React.FC<TestModalProps> = ({
   // Determine active steps for the progress bar based on the DISPLAY scenario ID
   const activeTestSteps = React.useMemo(() => {
     const allSteps = [
-      { key: "latency", label: t("Latency") },
-      { key: "download", label: t("Download") },
-      { key: "upload", label: t("Upload") },
-      { key: "web", label: t("Web Browsing") },
-      { key: "streaming", label: t("Video Streaming") },
+      { key: "latency", label: "Latency" },
+      { key: "download", label: "Download" },
+      { key: "upload", label: "Upload" },
+      { key: "web", label: "Web Browsing" },
+      { key: "streaming", label: "Video Streaming" },
     ];
 
     const isFullTestDisplay =
@@ -332,6 +353,7 @@ export const TestModal: React.FC<TestModalProps> = ({
 
   const initializeSystem = async (scenarioIdOverride?: number) => {
     setIsInitializing(true);
+    console.log("🚀 [TestModal] initializeSystem started");
 
     try {
       // Determine which ID to use: Override -> State -> Default
@@ -354,9 +376,19 @@ export const TestModal: React.FC<TestModalProps> = ({
         setTestEngine(engine);
       }
 
-      await engine.getAPIClient().authenticate();
+      await withTimeout(
+        engine.getAPIClient().authenticate(),
+        TIMEOUT_MS,
+        "Authentication timed out"
+      );
+      console.log("✅ [TestModal] Authenticated");
 
-      const scenarios = await engine.getAvailableScenarios();
+      const scenarios = await withTimeout(
+        engine.getAvailableScenarios(),
+        TIMEOUT_MS,
+        "Fetching scenarios timed out"
+      );
+      console.log("✅ [TestModal] Scenarios fetched:", scenarios.length);
       setAvailableScenarios(scenarios);
 
       // IMPORTANT: Load the scenario based on the TARGET ID, not the old props
@@ -370,13 +402,18 @@ export const TestModal: React.FC<TestModalProps> = ({
       const geoipRes = await engine
         .getAPIClient()
         .getGeoIP()
-        .catch(() => null);
+        .catch((e) => {
+          console.warn("⚠️ [TestModal] GeoIP failed:", e);
+          return null;
+        });
+      console.log("✅ [TestModal] GeoIP fetched");
 
       const gpsResult = await GeolocationService.getLocation({
         enableHighAccuracy: true,
         timeout: GEO_CONFIG.OPTIONS.timeout,
         maximumAge: GEO_CONFIG.OPTIONS.maximumAge,
       });
+      console.log("✅ [TestModal] GPS location fetched:", gpsResult);
 
       const operatorName =
         geoipRes?.meta.code === 200 ? geoipRes.content.data.isp : undefined;
@@ -412,6 +449,7 @@ export const TestModal: React.FC<TestModalProps> = ({
         (await engine
           .selectOptimalServer(geolocation, environment)
           .then(() => engine.getSelectedServer()));
+      console.log("✅ [TestModal] Best server selected:", bestServer?.name);
 
       setGeoipResponse(geoipRes);
 
@@ -435,6 +473,7 @@ export const TestModal: React.FC<TestModalProps> = ({
 
       return { testEngine: engine, systemInfo };
     } catch (error) {
+      console.error("❌ [TestModal] Initialization error:", error);
       setError(
         `Initialization failed: ${
           error instanceof Error ? error.message : "Unknown error"
@@ -1404,7 +1443,7 @@ export const TestModal: React.FC<TestModalProps> = ({
                   />
                 </div>
                 <h2 className="text-size1 text-gray-900 dark:text-gray-100 flex items-center justify-center gap-2 max-sm:mb-[0.5rem] max-sm:mt-[1rem]">
-                  {isRunning && !isInitializing && "Running a"}{" "}
+                  {isRunning && !isInitializing && t("Running a")}{" "}
                   {getTestTitle().split(":")[0]}
                   <Tooltip
                     title={t(

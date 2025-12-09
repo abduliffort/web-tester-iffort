@@ -115,19 +115,19 @@ const RenderCompletedResults = ({
     ...(!isFullTest
       ? [
           {
-            label: t("Latency"),
+            label: "Latency",
             value: latency.toFixed(0),
             unit: "ms",
             icon: <ArrowLeftRight size={iconClass} className="text-white/70" />,
           },
           {
-            label: t("Download"),
+            label: "Download",
             value: downloadSpeed.toFixed(1),
             unit: "Mbps",
             icon: <Download size={iconClass} className="text-white/70" />,
           },
           {
-            label: t("Upload"),
+            label: "Upload",
             value: uploadSpeed.toFixed(1),
             unit: "Mbps",
             icon: <Upload size={iconClass} className="text-white/70" />,
@@ -139,13 +139,13 @@ const RenderCompletedResults = ({
     ...(isFullTest
       ? [
           {
-            label: t("Web Browsing Delay"),
+            label: "Web Browsing Delay",
             value: webDelay.toFixed(3),
             unit: "ms",
             icon: <Globe size={iconClass} className="text-white/70" />,
           },
           {
-            label: t("Video Streaming Delay"),
+            label: "Video Streaming Delay",
             value: streamingDelay.toFixed(3),
             unit: "ms",
             icon: <Video size={iconClass} className="text-white/70" />,
@@ -220,7 +220,7 @@ const RenderCompletedResults = ({
                     item.label.includes("Web") ||
                     item.label.includes("Video")
                   ) {
-                    displayValue = (numericValue / 1000).toFixed(2); // ✅ two decimals
+                    displayValue = (numericValue / 1000).toFixed(2);
                     displayUnit = "Seconds";
                   }
                 } else {

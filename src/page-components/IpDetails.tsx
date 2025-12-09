@@ -37,31 +37,22 @@ function IpDetails({ className }: { className?: string }) {
     };
   }, []);
 
-  const labels = useMemo(
-    () => ({
-      isp: t("ISP Name"),
-      ip: t("IP Address"),
-      location: t("Location"),
-    }),
-    [t]
-  );
-
   return (
     <footer
       className={`${className} flex flex-row sm:grid sm:grid-cols-3 justify-between text-center gap-3 sm:gap-0 mx-auto w-full text-xs sm:text-sm mt-auto max-w-7xl mb-[6rem] max-sm:mb-[4rem]`}
     >
       <div className="flex-1">
-        <div className="text-white/50 text-size4">{labels.isp}</div>
+        <div className="text-white/50 text-size4">{t("ISP Name")}</div>
         <div className="mt-1 px-1 sm:px-2 text-size3 text-white">{t(isp)}</div>
       </div>
       <div className="flex-1">
-        <div className="text-white/50 text-size4">{labels.ip}</div>
+        <div className="text-white/50 text-size4">{t("IP Address")}</div>
         <div className="mt-1 break-all px-1 sm:px-2 text-size3 text-white">
           {ip}
         </div>
       </div>
       <div className="flex-1">
-        <div className="text-white/50 text-size4">{labels.location}</div>
+        <div className="text-white/50 text-size4">{t("Location")}</div>
         <div className="mt-1 px-1 sm:px-2 text-size3 text-white">
           {t(location)}
         </div>
